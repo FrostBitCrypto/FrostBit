@@ -243,7 +243,9 @@ wallet (wallet_a)
 		}
 	});
 	QObject::connect (account_key_line, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = account_key_line->cursorPosition ();
 		account_key_line->setText (value.trimmed ());
+		account_key_line->setCursorPosition (pos);
 	});
 	refresh_wallet_balance ();
 }
@@ -255,7 +257,7 @@ void rai_qt::accounts::refresh_wallet_balance ()
 	rai::uint128_t pending (0);
 	for (auto i (this->wallet.wallet_m->store.begin (transaction)), j (this->wallet.wallet_m->store.end ()); i != j; ++i)
 	{
-		rai::public_key key (i->first.uint256 ());
+		rai::public_key key (i->first);
 		balance = balance + (this->wallet.node.ledger.account_balance (transaction, key));
 		pending = pending + (this->wallet.node.ledger.account_pending (transaction, key));
 	}
@@ -279,7 +281,7 @@ void rai_qt::accounts::refresh ()
 	QBrush brush;
 	for (auto i (wallet.wallet_m->store.begin (transaction)), j (wallet.wallet_m->store.end ()); i != j; ++i)
 	{
-		rai::public_key key (i->first.uint256 ());
+		rai::public_key key (i->first);
 		auto balance_amount (wallet.node.ledger.account_balance (transaction, key));
 		bool display (true);
 		switch (wallet.wallet_m->store.key_type (i->second))
@@ -448,10 +450,14 @@ wallet (wallet_a)
 		}
 	});
 	QObject::connect (seed, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = seed->cursorPosition ();
 		seed->setText (value.trimmed ());
+		seed->setCursorPosition (pos);
 	});
 	QObject::connect (filename, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = filename->cursorPosition ();
 		filename->setText (value.trimmed ());
+		filename->setCursorPosition (pos);
 	});
 }
 
@@ -546,6 +552,11 @@ public:
 			{
 				type = "Change";
 				account = block_a.hashables.representative;
+			}
+			else if (balance == previous_balance && !ledger.epoch_link.is_zero () && block_a.hashables.link == ledger.epoch_link)
+			{
+				type = "Epoch";
+				account = ledger.epoch_signer;
 			}
 			else
 			{
@@ -654,7 +665,9 @@ wallet (wallet_a)
 		}
 	});
 	QObject::connect (hash, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = hash->cursorPosition ();
 		hash->setText (value.trimmed ());
+		hash->setCursorPosition (pos);
 	});
 	rebroadcast->setToolTip ("Rebroadcast block into the network");
 }
@@ -733,7 +746,9 @@ wallet (wallet_a)
 		}
 	});
 	QObject::connect (account_line, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = account_line->cursorPosition ();
 		account_line->setText (value.trimmed ());
+		account_line->setCursorPosition (pos);
 	});
 }
 
@@ -1011,15 +1026,19 @@ active_status (*this)
 	client_layout->setSpacing (0);
 	client_layout->setContentsMargins (0, 0, 0, 0);
 	client_window->setLayout (client_layout);
-	client_window->resize (500, 620);
+	client_window->resize (620, 640);
 	client_window->setStyleSheet ("\
 		QLineEdit { padding: 3px; } \
 	");
 	QObject::connect (send_account, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = send_account->cursorPosition ();
 		send_account->setText (value.trimmed ());
+		send_account->setCursorPosition (pos);
 	});
 	QObject::connect (send_count, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = send_count->cursorPosition ();
 		send_count->setText (value.trimmed ());
+		send_count->setCursorPosition (pos);
 	});
 	refresh ();
 }
@@ -1504,7 +1523,7 @@ wallet (wallet_a)
 				change_rep->setEnabled (true);
 				show_button_success (*change_rep);
 				change_rep->setText ("Representative was changed");
-				current_representative->setText (QString (representative_l.to_account_split ().c_str ()));
+				current_representative->setText (QString (representative_l.to_account ().c_str ()));
 				new_representative->clear ();
 				this->wallet.node.alarm.add (std::chrono::steady_clock::now () + std::chrono::seconds (5), [this]() {
 					this->wallet.application.postEvent (&this->wallet.processor, new eventloop_event ([this]() {
@@ -1586,7 +1605,9 @@ wallet (wallet_a)
 		}
 	});
 	QObject::connect (new_representative, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = new_representative->cursorPosition ();
 		new_representative->setText (value.trimmed ());
+		new_representative->setCursorPosition (pos);
 	});
 
 	// initial state for lock toggle button
@@ -1610,11 +1631,11 @@ void rai_qt::settings::refresh_representative ()
 	{
 		auto block (this->wallet.wallet_m->node.store.block_get (transaction, info.rep_block));
 		assert (block != nullptr);
-		current_representative->setText (QString (block->representative ().to_account_split ().c_str ()));
+		current_representative->setText (QString (block->representative ().to_account ().c_str ()));
 	}
 	else
 	{
-		current_representative->setText (this->wallet.wallet_m->store.representative (transaction).to_account_split ().c_str ());
+		current_representative->setText (this->wallet.wallet_m->store.representative (transaction).to_account ().c_str ());
 	}
 }
 
@@ -1674,7 +1695,9 @@ peers_window (new QWidget),
 peers_layout (new QVBoxLayout),
 peers_model (new QStandardItemModel),
 peers_view (new QTableView),
+peer_summary_layout (new QHBoxLayout),
 bootstrap_label (new QLabel ("IPV6:port \"::ffff:192.168.0.1:7075\"")),
+peer_count_label (new QLabel ("")),
 bootstrap_line (new QLineEdit),
 peers_bootstrap (new QPushButton ("Initiate Bootstrap")),
 peers_refresh (new QPushButton ("Refresh")),
@@ -1715,7 +1738,10 @@ wallet (wallet_a)
 	peers_view->setSortingEnabled (true);
 	peers_view->horizontalHeader ()->setStretchLastSection (true);
 	peers_layout->addWidget (peers_view);
-	peers_layout->addWidget (bootstrap_label);
+	peer_summary_layout->addWidget (bootstrap_label);
+	peer_summary_layout->addStretch ();
+	peer_summary_layout->addWidget (peer_count_label);
+	peers_layout->addLayout (peer_summary_layout);
 	peers_layout->addWidget (bootstrap_line);
 	peers_layout->addWidget (peers_bootstrap);
 	peers_layout->addWidget (peers_refresh);
@@ -1839,9 +1865,12 @@ void rai_qt::advanced_actions::refresh_peers ()
 		QString qendpoint (endpoint.str ().c_str ());
 		QList<QStandardItem *> items;
 		items.push_back (new QStandardItem (qendpoint));
-		items.push_back (new QStandardItem (QString (std::to_string (i->second).c_str ())));
+		auto version = new QStandardItem ();
+		version->setData (QVariant (i->second), Qt::DisplayRole);
+		items.push_back (version);
 		peers_model->appendRow (items);
 	}
+	peer_count_label->setText (QString ("%1 peers").arg (peers_model->rowCount ()));
 }
 
 void rai_qt::advanced_actions::refresh_ledger ()
@@ -1851,7 +1880,7 @@ void rai_qt::advanced_actions::refresh_ledger ()
 	for (auto i (wallet.node.ledger.store.latest_begin (transaction)), j (wallet.node.ledger.store.latest_end ()); i != j; ++i)
 	{
 		QList<QStandardItem *> items;
-		items.push_back (new QStandardItem (QString (rai::block_hash (i->first.uint256 ()).to_account ().c_str ())));
+		items.push_back (new QStandardItem (QString (rai::block_hash (i->first).to_account ().c_str ())));
 		rai::account_info info (i->second);
 		std::string balance;
 		rai::amount (info.balance.number () / wallet.rendering_ratio).encode_dec (balance);
@@ -2020,19 +2049,29 @@ wallet (wallet_a)
 		this->wallet.pop_main_stack ();
 	});
 	QObject::connect (account, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = account->cursorPosition ();
 		account->setText (value.trimmed ());
+		account->setCursorPosition (pos);
 	});
 	QObject::connect (destination, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = destination->cursorPosition ();
 		destination->setText (value.trimmed ());
+		destination->setCursorPosition (pos);
 	});
 	QObject::connect (amount, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = amount->cursorPosition ();
 		amount->setText (value.trimmed ());
+		amount->setCursorPosition (pos);
 	});
 	QObject::connect (source, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = source->cursorPosition ();
 		source->setText (value.trimmed ());
+		source->setCursorPosition (pos);
 	});
 	QObject::connect (representative, &QLineEdit::textChanged, [this](const QString & value) {
+		auto pos = representative->cursorPosition ();
 		representative->setText (value.trimmed ());
+		representative->setCursorPosition (pos);
 	});
 
 	send->click ();
@@ -2108,7 +2147,9 @@ void rai_qt::block_creation::create_send ()
 						rai::account_info info;
 						auto error (wallet.node.store.account_get (transaction, account_l, info));
 						assert (!error);
-						rai::send_block send (info.head, destination_l, balance - amount_l.number (), key, account_l, 0);
+						auto rep_block (wallet.node.store.block_get (transaction, info.rep_block));
+						assert (rep_block != nullptr);
+						rai::state_block send (account_l, info.head, rep_block->representative (), balance - amount_l.number (), destination_l, key, account_l, 0);
 						wallet.node.work_generate_blocking (send);
 						std::string block_l;
 						send.serialize_json (block_l);
@@ -2172,7 +2213,9 @@ void rai_qt::block_creation::create_receive ()
 						auto error (wallet.wallet_m->store.fetch (transaction, pending_key.account, key));
 						if (!error)
 						{
-							rai::receive_block receive (info.head, source_l, key, pending_key.account, 0);
+							auto rep_block (wallet.node.store.block_get (transaction, info.rep_block));
+							assert (rep_block != nullptr);
+							rai::state_block receive (pending_key.account, info.head, rep_block->representative (), info.balance.number () + pending.amount.number (), source_l, key, pending_key.account, 0);
 							wallet.node.work_generate_blocking (receive);
 							std::string block_l;
 							receive.serialize_json (block_l);
@@ -2236,7 +2279,7 @@ void rai_qt::block_creation::create_change ()
 				auto error (wallet.wallet_m->store.fetch (transaction, account_l, key));
 				if (!error)
 				{
-					rai::change_block change (info.head, representative_l, key, account_l, 0);
+					rai::state_block change (account_l, info.head, representative_l, info.balance, 0, key, account_l, 0);
 					wallet.node.work_generate_blocking (change);
 					std::string block_l;
 					change.serialize_json (block_l);
@@ -2298,7 +2341,7 @@ void rai_qt::block_creation::create_open ()
 							auto error (wallet.wallet_m->store.fetch (transaction, pending_key.account, key));
 							if (!error)
 							{
-								rai::open_block open (source_l, representative_l, pending_key.account, key, pending_key.account, 0);
+								rai::state_block open (pending_key.account, 0, representative_l, pending.amount, source_l, key, pending_key.account, 0);
 								wallet.node.work_generate_blocking (open);
 								std::string block_l;
 								open.serialize_json (block_l);
