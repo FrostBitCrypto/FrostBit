@@ -329,7 +329,7 @@ if (FROSTBIT_GUI)
 	endif ()
 
 	if (APPLE)
-		install (TARGETS fstbt_wallet DESTINATION frostbit.app/Contents/MacOS)
+		install (TARGETS frostbit_wallet DESTINATION frostbit.app/Contents/MacOS)
 		install (FILES Info.plist DESTINATION frostbit.app/Contents)
 		install (FILES qt.conf DESTINATION frostbit.app/Contents/Resources)
 		install (DIRECTORY ${Qt5_DIR}/../../QtCore.framework DESTINATION frostbit.app/Contents/Frameworks)
