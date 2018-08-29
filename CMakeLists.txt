@@ -356,7 +356,7 @@ if (FROSTBIT_GUI)
 		set (CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 		get_target_property (Qt5WindowsPlugin Qt5::QWindowsIntegrationPlugin LOCATION)
 		get_filename_component (Qt5_bin_DIR ${Qt5_DIR}/../../../bin ABSOLUTE)
-		install (TARGETS fstbt_wallet DESTINATION .)
+		install (TARGETS frostbit_wallet DESTINATION .)
 		install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${WIN_REDIST} DESTINATION .)
 		install (FILES ${Qt5_bin_DIR}/libGLESv2.dll DESTINATION .)
 		install (FILES ${Qt5_bin_DIR}/Qt5Core.dll DESTINATION .)
@@ -365,7 +365,7 @@ if (FROSTBIT_GUI)
 		install (FILES ${Qt5_bin_DIR}/Qt5WinExtras.dll DESTINATION .)
 		install (FILES ${Qt5WindowsPlugin} DESTINATION platforms)
 	else ()
-		install(TARGETS fstbt_wallet
+		install(TARGETS frostbit_wallet
 				RUNTIME DESTINATION bin
 				LIBRARY DESTINATION lib
 				ARCHIVE DESTINATION lib
