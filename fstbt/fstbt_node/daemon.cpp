@@ -1,17 +1,17 @@
-#include <rai/rai_node/daemon.hpp>
+#include <fstbt/fstbt_node/daemon.hpp>
 
 #include <boost/property_tree/json_parser.hpp>
 #include <fstream>
 #include <iostream>
-#include <rai/node/working.hpp>
+#include <fstbt/node/working.hpp>
 
-rai_daemon::daemon_config::daemon_config (boost::filesystem::path const & application_path_a) :
+fstbt_daemon::daemon_config::daemon_config (boost::filesystem::path const & application_path_a) :
 rpc_enable (false),
 opencl_enable (false)
 {
 }
 
-void rai_daemon::daemon_config::serialize_json (boost::property_tree::ptree & tree_a)
+void fstbt_daemon::daemon_config::serialize_json (boost::property_tree::ptree & tree_a)
 {
 	tree_a.put ("version", "2");
 	tree_a.put ("rpc_enable", rpc_enable);
@@ -27,7 +27,7 @@ void rai_daemon::daemon_config::serialize_json (boost::property_tree::ptree & tr
 	tree_a.add_child ("opencl", opencl_l);
 }
 
-bool rai_daemon::daemon_config::deserialize_json (bool & upgraded_a, boost::property_tree::ptree & tree_a)
+bool fstbt_daemon::daemon_config::deserialize_json (bool & upgraded_a, boost::property_tree::ptree & tree_a)
 {
 	auto error (false);
 	try
@@ -63,7 +63,7 @@ bool rai_daemon::daemon_config::deserialize_json (bool & upgraded_a, boost::prop
 	return error;
 }
 
-bool rai_daemon::daemon_config::upgrade_json (unsigned version_a, boost::property_tree::ptree & tree_a)
+bool fstbt_daemon::daemon_config::upgrade_json (unsigned version_a, boost::property_tree::ptree & tree_a)
 {
 	auto result (false);
 	switch (version_a)
@@ -93,10 +93,10 @@ bool rai_daemon::daemon_config::upgrade_json (unsigned version_a, boost::propert
 	return result;
 }
 
-void rai_daemon::daemon::run (boost::filesystem::path const & data_path)
+void fstbt_daemon::daemon::run (boost::filesystem::path const & data_path)
 {
 	boost::filesystem::create_directories (data_path);
-	rai_daemon::daemon_config config (data_path);
+	fstbt_daemon::daemon_config config (data_path);
 	auto config_path ((data_path / "config.json"));
 	std::fstream config_file;
 	std::unique_ptr<rai::thread_runner> runner;

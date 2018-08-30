@@ -1,7 +1,7 @@
 #include <fstbt/node/node.hpp>
 #include <fstbt/node/rpc.hpp>
 
-namespace rai_daemon
+namespace fstbt_daemon
 {
 class daemon
 {
