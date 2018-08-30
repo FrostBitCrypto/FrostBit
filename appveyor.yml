@@ -2,7 +2,7 @@ version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_branch_with_pr: true
-max_jobs: 3
+max_jobs: 2
 image: Visual Studio 2017
 configuration: Release
 platform: x64
@@ -10,7 +10,6 @@ environment:
   matrix:
     - network: fstbt_live_network
     - network: fstbt_beta_network
-	- network: fstbt_test_network
 clone_folder: C:\projects\myproject
 install:
 - cmd: >-
