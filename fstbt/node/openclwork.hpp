@@ -1,6 +1,6 @@
 #pragma once
 
-#include <rai/node/xorshift.hpp>
+#include <fstbt/node/xorshift.hpp>
 
 #include <boost/optional.hpp>
 #include <boost/property_tree/ptree.hpp>

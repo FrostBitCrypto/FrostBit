@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/program_options.hpp>
-#include <rai/lib/errors.hpp>
+#include <fstbt/lib/errors.hpp>
 
 namespace rai
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <rai/node/common.hpp>
-#include <rai/node/openclwork.hpp>
-#include <rai/secure/blockstore.hpp>
-#include <rai/secure/common.hpp>
+#include <fstbt/node/common.hpp>
+#include <fstbt/node/openclwork.hpp>
+#include <fstbt/secure/blockstore.hpp>
+#include <fstbt/secure/common.hpp>
 
 #include <mutex>
 #include <queue>

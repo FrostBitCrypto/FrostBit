@@ -1,10 +1,10 @@
 #pragma once
 
-#include <rai/lib/work.hpp>
-#include <rai/node/bootstrap.hpp>
-#include <rai/node/stats.hpp>
-#include <rai/node/wallet.hpp>
-#include <rai/secure/ledger.hpp>
+#include <fstbt/lib/work.hpp>
+#include <fstbt/node/bootstrap.hpp>
+#include <fstbt/node/stats.hpp>
+#include <fstbt/node/wallet.hpp>
+#include <fstbt/secure/ledger.hpp>
 
 #include <condition_variable>
 

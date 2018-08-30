@@ -4,8 +4,8 @@
 
 #include <lmdb/libraries/liblmdb/lmdb.h>
 
-#include <rai/lib/numbers.hpp>
-#include <rai/secure/common.hpp>
+#include <fstbt/lib/numbers.hpp>
+#include <fstbt/secure/common.hpp>
 
 namespace rai
 {

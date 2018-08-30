@@ -12,9 +12,9 @@
 
 #include <cryptopp/osrng.h>
 
-#include <rai/lib/config.hpp>
-#include <rai/lib/interface.h>
-#include <rai/lib/numbers.hpp>
+#include <fstbt/lib/config.hpp>
+#include <fstbt/lib/interface.h>
+#include <fstbt/lib/numbers.hpp>
 
 namespace rai
 {
