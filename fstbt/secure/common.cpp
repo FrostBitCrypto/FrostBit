@@ -51,14 +51,14 @@ public:
 	ledger_constants () :
 	zero_key ("0"),
 	test_genesis_key (test_private_key_data),
-	rai_test_account (test_public_key_data),
-	rai_beta_account (beta_public_key_data),
-	rai_live_account (live_public_key_data),
-	rai_test_genesis (test_genesis_data),
-	rai_beta_genesis (beta_genesis_data),
-	rai_live_genesis (live_genesis_data),
-	genesis_account (rai::rai_network == rai::rai_networks::rai_test_network ? rai_test_account : rai::rai_network == rai::rai_networks::rai_beta_network ? rai_beta_account : rai_live_account),
-	genesis_block (rai::rai_network == rai::rai_networks::rai_test_network ? rai_test_genesis : rai::rai_network == rai::rai_networks::rai_beta_network ? rai_beta_genesis : rai_live_genesis),
+	fstbt_test_account (test_public_key_data),
+	fstbt_beta_account (beta_public_key_data),
+	fstbt_live_account (live_public_key_data),
+	fstbt_test_genesis (test_genesis_data),
+	fstbt_beta_genesis (beta_genesis_data),
+	fstbt_live_genesis (live_genesis_data),
+	genesis_account (rai::fstbt_network == rai::fstbt_networks::fstbt_test_network ? fstbt_test_account : rai::fstbt_network == rai::fstbt_networks::fstbt_beta_network ? fstbt_beta_account : fstbt_live_account),
+	genesis_block (rai::fstbt_network == rai::fstbt_networks::fstbt_test_network ? fstbt_test_genesis : rai::fstbt_network == rai::fstbt_networks::fstbt_beta_network ? fstbt_beta_genesis : fstbt_live_genesis),
 	genesis_amount (std::numeric_limits<rai::uint128_t>::max ()),
 	burn_account (0)
 	{
@@ -69,12 +69,12 @@ public:
 	}
 	rai::keypair zero_key;
 	rai::keypair test_genesis_key;
-	rai::account rai_test_account;
-	rai::account rai_beta_account;
-	rai::account rai_live_account;
-	std::string rai_test_genesis;
-	std::string rai_beta_genesis;
-	std::string rai_live_genesis;
+	rai::account fstbt_test_account;
+	rai::account fstbt_beta_account;
+	rai::account fstbt_live_account;
+	std::string fstbt_test_genesis;
+	std::string fstbt_beta_genesis;
+	std::string fstbt_live_genesis;
 	rai::account genesis_account;
 	std::string genesis_block;
 	rai::uint128_t genesis_amount;
@@ -93,12 +93,12 @@ size_t constexpr rai::state_block::size;
 
 rai::keypair const & rai::zero_key (globals.zero_key);
 rai::keypair const & rai::test_genesis_key (globals.test_genesis_key);
-rai::account const & rai::rai_test_account (globals.rai_test_account);
-rai::account const & rai::rai_beta_account (globals.rai_beta_account);
-rai::account const & rai::rai_live_account (globals.rai_live_account);
-std::string const & rai::rai_test_genesis (globals.rai_test_genesis);
-std::string const & rai::rai_beta_genesis (globals.rai_beta_genesis);
-std::string const & rai::rai_live_genesis (globals.rai_live_genesis);
+rai::account const & rai::fstbt_test_account (globals.fstbt_test_account);
+rai::account const & rai::fstbt_beta_account (globals.fstbt_beta_account);
+rai::account const & rai::fstbt_live_account (globals.fstbt_live_account);
+std::string const & rai::fstbt_test_genesis (globals.fstbt_test_genesis);
+std::string const & rai::fstbt_beta_genesis (globals.fstbt_beta_genesis);
+std::string const & rai::fstbt_live_genesis (globals.fstbt_live_genesis);
 
 rai::account const & rai::genesis_account (globals.genesis_account);
 std::string const & rai::genesis_block (globals.genesis_block);
