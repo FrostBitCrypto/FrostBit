@@ -359,7 +359,7 @@ static void ucharcpyglb (uchar * dst, __global uchar const * src, size_t count)
 	}
 }
 	
-__kernel void raiblocks_work (__global ulong * attempt, __global ulong * result_a, __global uchar * item_a)
+__kernel void frostbit_work (__global ulong * attempt, __global ulong * result_a, __global uchar * item_a)
 {
 	int const thread = get_global_id (0);
 	uchar item_l [32];
@@ -609,7 +609,7 @@ logging (logging_a)
 									if (!error_a)
 									{
 										cl_int kernel_error (0);
-										kernel = clCreateKernel (program, "raiblocks_work", &kernel_error);
+										kernel = clCreateKernel (program, "frostbit_work", &kernel_error);
 										error_a |= kernel_error != CL_SUCCESS;
 										if (!error_a)
 										{

@@ -126,7 +126,7 @@ public:
 	static unsigned constexpr announcement_min = 2;
 	// Threshold to start logging blocks haven't yet been confirmed
 	static unsigned constexpr announcement_long = 20;
-	static unsigned constexpr announce_interval_ms = (rai::rai_network == rai::rai_networks::rai_test_network) ? 10 : 16000;
+	static unsigned constexpr announce_interval_ms = (rai::fstbt_network == rai::fstbt_networks::fstbt_test_network) ? 10 : 16000;
 	static size_t constexpr election_history_size = 2048;
 
 private:
@@ -331,8 +331,8 @@ public:
 	UPNPUrls urls; // Something for UPnP
 	IGDdatas data; // Some other UPnP thing
 	// Primes so they infrequently happen at the same time
-	static int constexpr mapping_timeout = rai::rai_network == rai::rai_networks::rai_test_network ? 53 : 3593;
-	static int constexpr check_timeout = rai::rai_network == rai::rai_networks::rai_test_network ? 17 : 53;
+	static int constexpr mapping_timeout = rai::fstbt_network == rai::fstbt_networks::fstbt_test_network ? 53 : 3593;
+	static int constexpr check_timeout = rai::fstbt_network == rai::fstbt_networks::fstbt_test_network ? 17 : 53;
 	boost::asio::ip::address_v4 address;
 	std::array<mapping_protocol, 2> protocols;
 	uint64_t check_count;
@@ -416,7 +416,7 @@ public:
 	boost::asio::ip::udp::resolver resolver;
 	rai::node & node;
 	bool on;
-	static uint16_t const node_port = rai::rai_network == rai::rai_networks::rai_live_network ? 7075 : 54000;
+	static uint16_t const node_port = rai::fstbt_network == rai::fstbt_networks::fstbt_live_network ? 7075 : 54000;
 };
 class logging
 {

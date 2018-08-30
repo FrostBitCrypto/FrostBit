@@ -4,7 +4,7 @@
 #include <fstbt/lib/interface.h>
 #include <fstbt/node/node.hpp>
 
-#ifdef RAIBLOCKS_SECURE_RPC
+#ifdef FROSTBIT_SECURE_RPC
 #include <fstbt/node/rpc_secure.hpp>
 #endif
 
@@ -2787,7 +2787,7 @@ void rai::rpc_handler::version ()
 {
 	response_l.put ("rpc_version", "1");
 	response_l.put ("store_version", std::to_string (node.store_version ()));
-	response_l.put ("node_vendor", boost::str (boost::format ("RaiBlocks %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR));
+	response_l.put ("node_vendor", boost::str (boost::format ("FrostBit %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR));
 	response_errors ();
 }
 
@@ -4086,7 +4086,7 @@ std::unique_ptr<rai::rpc> rai::get_rpc (boost::asio::io_service & service_a, rai
 
 	if (config_a.secure.enable)
 	{
-#ifdef RAIBLOCKS_SECURE_RPC
+#ifdef FROSTBIT_SECURE_RPC
 		impl.reset (new rpc_secure (service_a, node_a, config_a));
 #else
 		std::cerr << "RPC configured for TLS, but the node is not compiled with TLS support" << std::endl;
