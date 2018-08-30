@@ -43,20 +43,20 @@ void show_button_success (QPushButton & button)
 }
 }
 
-bool rai_qt::eventloop_processor::event (QEvent * event_a)
+bool fstbt_qt::eventloop_processor::event (QEvent * event_a)
 {
-	assert (dynamic_cast<rai_qt::eventloop_event *> (event_a) != nullptr);
-	static_cast<rai_qt::eventloop_event *> (event_a)->action ();
+	assert (dynamic_cast<fstbt_qt::eventloop_event *> (event_a) != nullptr);
+	static_cast<fstbt_qt::eventloop_event *> (event_a)->action ();
 	return true;
 }
 
-rai_qt::eventloop_event::eventloop_event (std::function<void()> const & action_a) :
+fstbt_qt::eventloop_event::eventloop_event (std::function<void()> const & action_a) :
 QEvent (QEvent::Type::User),
 action (action_a)
 {
 }
 
-rai_qt::self_pane::self_pane (rai_qt::wallet & wallet_a, rai::account const & account_a) :
+fstbt_qt::self_pane::self_pane (fstbt_qt::wallet & wallet_a, rai::account const & account_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 self_layout (new QHBoxLayout),
@@ -72,7 +72,7 @@ balance_label (new QLabel),
 wallet (wallet_a)
 {
 	your_account_label->setStyleSheet ("font-weight: bold;");
-	version = new QLabel (boost::str (boost::format ("Version %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR).c_str ());
+	version = new QLabel (boost::str (boost::format ("Version %1%.%2%") % FROSTBIT_VERSION_MAJOR % FROSTBIT_VERSION_MINOR).c_str ());
 	self_layout->addWidget (your_account_label);
 	self_layout->addStretch ();
 	self_layout->addWidget (version);
@@ -106,7 +106,7 @@ wallet (wallet_a)
 	});
 }
 
-void rai_qt::self_pane::refresh_balance ()
+void fstbt_qt::self_pane::refresh_balance ()
 {
 	auto balance (wallet.node.balance_pending (wallet.account));
 	auto final_text (std::string ("Balance: ") + wallet.format_balance (balance.first));
@@ -117,7 +117,7 @@ void rai_qt::self_pane::refresh_balance ()
 	wallet.self.balance_label->setText (QString (final_text.c_str ()));
 }
 
-rai_qt::accounts::accounts (rai_qt::wallet & wallet_a) :
+fstbt_qt::accounts::accounts (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 wallet_balance_label (new QLabel),
 layout (new QVBoxLayout),
@@ -250,7 +250,7 @@ wallet (wallet_a)
 	refresh_wallet_balance ();
 }
 
-void rai_qt::accounts::refresh_wallet_balance ()
+void fstbt_qt::accounts::refresh_wallet_balance ()
 {
 	rai::transaction transaction (this->wallet.wallet_m->wallets.environment, false);
 	rai::uint128_t balance (0);
@@ -274,7 +274,7 @@ void rai_qt::accounts::refresh_wallet_balance ()
 	});
 }
 
-void rai_qt::accounts::refresh ()
+void fstbt_qt::accounts::refresh ()
 {
 	model->removeRows (0, model->rowCount ());
 	rai::transaction transaction (wallet.wallet_m->wallets.environment, false);
@@ -311,7 +311,7 @@ void rai_qt::accounts::refresh ()
 	}
 }
 
-rai_qt::import::import (rai_qt::wallet & wallet_a) :
+fstbt_qt::import::import (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 seed_label (new QLabel ("Seed:")),
@@ -461,7 +461,7 @@ wallet (wallet_a)
 	});
 }
 
-rai_qt::history::history (rai::ledger & ledger_a, rai::account const & account_a, rai_qt::wallet & wallet_a) :
+fstbt_qt::history::history (rai::ledger & ledger_a, rai::account const & account_a, fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 model (new QStandardItemModel),
@@ -574,7 +574,7 @@ public:
 };
 }
 
-void rai_qt::history::refresh ()
+void fstbt_qt::history::refresh ()
 {
 	rai::transaction transaction (ledger.store.environment, false);
 	model->removeRows (0, model->rowCount ());
@@ -597,7 +597,7 @@ void rai_qt::history::refresh ()
 	}
 }
 
-rai_qt::block_viewer::block_viewer (rai_qt::wallet & wallet_a) :
+fstbt_qt::block_viewer::block_viewer (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 hash_label (new QLabel ("Hash:")),
@@ -672,7 +672,7 @@ wallet (wallet_a)
 	rebroadcast->setToolTip ("Rebroadcast block into the network");
 }
 
-void rai_qt::block_viewer::rebroadcast_action (rai::uint256_union const & hash_a)
+void fstbt_qt::block_viewer::rebroadcast_action (rai::uint256_union const & hash_a)
 {
 	auto done (true);
 	rai::transaction transaction (wallet.node.ledger.store.environment, false);
@@ -697,7 +697,7 @@ void rai_qt::block_viewer::rebroadcast_action (rai::uint256_union const & hash_a
 	}
 }
 
-rai_qt::account_viewer::account_viewer (rai_qt::wallet & wallet_a) :
+fstbt_qt::account_viewer::account_viewer (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 account_label (new QLabel ("Account:")),
@@ -752,7 +752,7 @@ wallet (wallet_a)
 	});
 }
 
-rai_qt::stats_viewer::stats_viewer (rai_qt::wallet & wallet_a) :
+fstbt_qt::stats_viewer::stats_viewer (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 model (new QStandardItemModel),
@@ -786,7 +786,7 @@ wallet (wallet_a)
 	refresh_stats ();
 }
 
-void rai_qt::stats_viewer::refresh_stats ()
+void fstbt_qt::stats_viewer::refresh_stats ()
 {
 	model->removeRows (0, model->rowCount ());
 
@@ -834,36 +834,36 @@ void rai_qt::stats_viewer::refresh_stats ()
 	}
 }
 
-rai_qt::status::status (rai_qt::wallet & wallet_a) :
+fstbt_qt::status::status (fstbt_qt::wallet & wallet_a) :
 wallet (wallet_a)
 {
 	wallet.status->setToolTip ("Wallet status, block count (blocks downloaded)");
-	active.insert (rai_qt::status_types::nominal);
+	active.insert (fstbt_qt::status_types::nominal);
 	set_text ();
 }
 
-void rai_qt::status::erase (rai_qt::status_types status_a)
+void fstbt_qt::status::erase (fstbt_qt::status_types status_a)
 {
-	assert (status_a != rai_qt::status_types::nominal);
+	assert (status_a != fstbt_qt::status_types::nominal);
 	auto erased (active.erase (status_a));
 	(void)erased;
 	set_text ();
 }
 
-void rai_qt::status::insert (rai_qt::status_types status_a)
+void fstbt_qt::status::insert (fstbt_qt::status_types status_a)
 {
-	assert (status_a != rai_qt::status_types::nominal);
+	assert (status_a != fstbt_qt::status_types::nominal);
 	active.insert (status_a);
 	set_text ();
 }
 
-void rai_qt::status::set_text ()
+void fstbt_qt::status::set_text ()
 {
 	wallet.status->setText (text ().c_str ());
 	wallet.status->setStyleSheet ((std::string ("QLabel {") + color () + "}").c_str ());
 }
 
-std::string rai_qt::status::text ()
+std::string fstbt_qt::status::text ()
 {
 	assert (!active.empty ());
 	std::string result;
@@ -878,25 +878,25 @@ std::string rai_qt::status::text ()
 
 	switch (*active.begin ())
 	{
-		case rai_qt::status_types::disconnected:
+		case fstbt_qt::status_types::disconnected:
 			result = "Status: Disconnected";
 			break;
-		case rai_qt::status_types::working:
+		case fstbt_qt::status_types::working:
 			result = "Status: Generating proof of work";
 			break;
-		case rai_qt::status_types::synchronizing:
+		case fstbt_qt::status_types::synchronizing:
 			result = "Status: Synchronizing";
 			break;
-		case rai_qt::status_types::locked:
+		case fstbt_qt::status_types::locked:
 			result = "Status: Wallet locked";
 			break;
-		case rai_qt::status_types::vulnerable:
+		case fstbt_qt::status_types::vulnerable:
 			result = "Status: Wallet password empty";
 			break;
-		case rai_qt::status_types::active:
+		case fstbt_qt::status_types::active:
 			result = "Status: Wallet active";
 			break;
-		case rai_qt::status_types::nominal:
+		case fstbt_qt::status_types::nominal:
 			result = "Status: Running";
 			break;
 		default:
@@ -914,31 +914,31 @@ std::string rai_qt::status::text ()
 	return result;
 }
 
-std::string rai_qt::status::color ()
+std::string fstbt_qt::status::color ()
 {
 	assert (!active.empty ());
 	std::string result;
 	switch (*active.begin ())
 	{
-		case rai_qt::status_types::disconnected:
+		case fstbt_qt::status_types::disconnected:
 			result = "color: red";
 			break;
-		case rai_qt::status_types::working:
+		case fstbt_qt::status_types::working:
 			result = "color: blue";
 			break;
-		case rai_qt::status_types::synchronizing:
+		case fstbt_qt::status_types::synchronizing:
 			result = "color: blue";
 			break;
-		case rai_qt::status_types::locked:
+		case fstbt_qt::status_types::locked:
 			result = "color: orange";
 			break;
-		case rai_qt::status_types::vulnerable:
+		case fstbt_qt::status_types::vulnerable:
 			result = "color: blue";
 			break;
-		case rai_qt::status_types::active:
+		case fstbt_qt::status_types::active:
 			result = "color: black";
 			break;
-		case rai_qt::status_types::nominal:
+		case fstbt_qt::status_types::nominal:
 			result = "color: black";
 			break;
 		default:
@@ -948,7 +948,7 @@ std::string rai_qt::status::color ()
 	return result;
 }
 
-rai_qt::wallet::wallet (QApplication & application_a, rai_qt::eventloop_processor & processor_a, rai::node & node_a, std::shared_ptr<rai::wallet> wallet_a, rai::account & account_a) :
+fstbt_qt::wallet::wallet (QApplication & application_a, fstbt_qt::eventloop_processor & processor_a, rai::node & node_a, std::shared_ptr<rai::wallet> wallet_a, rai::account & account_a) :
 rendering_ratio (rai::Mxrb_ratio),
 node (node_a),
 wallet_m (wallet_a),
@@ -1043,9 +1043,9 @@ active_status (*this)
 	refresh ();
 }
 
-void rai_qt::wallet::start ()
+void fstbt_qt::wallet::start ()
 {
-	std::weak_ptr<rai_qt::wallet> this_w (shared_from_this ());
+	std::weak_ptr<fstbt_qt::wallet> this_w (shared_from_this ());
 	QObject::connect (settings_button, &QPushButton::released, [this_w]() {
 		if (auto this_l = this_w.lock ())
 		{
@@ -1267,11 +1267,11 @@ void rai_qt::wallet::start ()
 				{
 					if (active_a)
 					{
-						this_l->active_status.insert (rai_qt::status_types::active);
+						this_l->active_status.insert (fstbt_qt::status_types::active);
 					}
 					else
 					{
-						this_l->active_status.erase (rai_qt::status_types::active);
+						this_l->active_status.erase (fstbt_qt::status_types::active);
 					}
 				}
 			}));
@@ -1307,11 +1307,11 @@ void rai_qt::wallet::start ()
 				{
 					if (active_a)
 					{
-						this_l->active_status.insert (rai_qt::status_types::synchronizing);
+						this_l->active_status.insert (fstbt_qt::status_types::synchronizing);
 					}
 					else
 					{
-						this_l->active_status.erase (rai_qt::status_types::synchronizing);
+						this_l->active_status.erase (fstbt_qt::status_types::synchronizing);
 					}
 				}
 			}));
@@ -1325,11 +1325,11 @@ void rai_qt::wallet::start ()
 				{
 					if (working)
 					{
-						this_l->active_status.insert (rai_qt::status_types::working);
+						this_l->active_status.insert (fstbt_qt::status_types::working);
 					}
 					else
 					{
-						this_l->active_status.erase (rai_qt::status_types::working);
+						this_l->active_status.erase (fstbt_qt::status_types::working);
 					}
 				}
 			}));
@@ -1349,7 +1349,7 @@ void rai_qt::wallet::start ()
 	settings_button->setToolTip ("Unlock wallet, set password, change representative");
 }
 
-void rai_qt::wallet::refresh ()
+void fstbt_qt::wallet::refresh ()
 {
 	{
 		rai::transaction transaction (wallet_m->wallets.environment, false);
@@ -1363,19 +1363,19 @@ void rai_qt::wallet::refresh ()
 	settings.refresh_representative ();
 }
 
-void rai_qt::wallet::update_connected ()
+void fstbt_qt::wallet::update_connected ()
 {
 	if (node.peers.empty ())
 	{
-		active_status.insert (rai_qt::status_types::disconnected);
+		active_status.insert (fstbt_qt::status_types::disconnected);
 	}
 	else
 	{
-		active_status.erase (rai_qt::status_types::disconnected);
+		active_status.erase (fstbt_qt::status_types::disconnected);
 	}
 }
 
-void rai_qt::wallet::empty_password ()
+void fstbt_qt::wallet::empty_password ()
 {
 	this->node.alarm.add (std::chrono::steady_clock::now () + std::chrono::seconds (3), [this]() {
 		rai::transaction transaction (wallet_m->wallets.environment, true);
@@ -1383,7 +1383,7 @@ void rai_qt::wallet::empty_password ()
 	});
 }
 
-void rai_qt::wallet::change_rendering_ratio (rai::uint128_t const & rendering_ratio_a)
+void fstbt_qt::wallet::change_rendering_ratio (rai::uint128_t const & rendering_ratio_a)
 {
 	application.postEvent (&processor, new eventloop_event ([this, rendering_ratio_a]() {
 		this->rendering_ratio = rendering_ratio_a;
@@ -1391,7 +1391,7 @@ void rai_qt::wallet::change_rendering_ratio (rai::uint128_t const & rendering_ra
 	}));
 }
 
-std::string rai_qt::wallet::format_balance (rai::uint128_t const & balance) const
+std::string fstbt_qt::wallet::format_balance (rai::uint128_t const & balance) const
 {
 	auto balance_str = rai::amount (balance).format_balance (rendering_ratio, 0, false);
 	auto unit = std::string ("XRB");
@@ -1406,18 +1406,18 @@ std::string rai_qt::wallet::format_balance (rai::uint128_t const & balance) cons
 	return balance_str + " " + unit;
 }
 
-void rai_qt::wallet::push_main_stack (QWidget * widget_a)
+void fstbt_qt::wallet::push_main_stack (QWidget * widget_a)
 {
 	main_stack->addWidget (widget_a);
 	main_stack->setCurrentIndex (main_stack->count () - 1);
 }
 
-void rai_qt::wallet::pop_main_stack ()
+void fstbt_qt::wallet::pop_main_stack ()
 {
 	main_stack->removeWidget (main_stack->currentWidget ());
 }
 
-rai_qt::settings::settings (rai_qt::wallet & wallet_a) :
+fstbt_qt::settings::settings (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 password (new QLineEdit),
@@ -1623,7 +1623,7 @@ wallet (wallet_a)
 	refresh_representative ();
 }
 
-void rai_qt::settings::refresh_representative ()
+void fstbt_qt::settings::refresh_representative ()
 {
 	rai::transaction transaction (wallet.node.store.environment, false);
 	rai::account_info info;
@@ -1640,32 +1640,32 @@ void rai_qt::settings::refresh_representative ()
 	}
 }
 
-void rai_qt::settings::activate ()
+void fstbt_qt::settings::activate ()
 {
 	this->wallet.push_main_stack (window);
 }
 
-void rai_qt::settings::update_locked (bool invalid, bool vulnerable)
+void fstbt_qt::settings::update_locked (bool invalid, bool vulnerable)
 {
 	if (invalid)
 	{
-		this->wallet.active_status.insert (rai_qt::status_types::locked);
+		this->wallet.active_status.insert (fstbt_qt::status_types::locked);
 	}
 	else
 	{
-		this->wallet.active_status.erase (rai_qt::status_types::locked);
+		this->wallet.active_status.erase (fstbt_qt::status_types::locked);
 	}
 	if (vulnerable)
 	{
-		this->wallet.active_status.insert (rai_qt::status_types::vulnerable);
+		this->wallet.active_status.insert (fstbt_qt::status_types::vulnerable);
 	}
 	else
 	{
-		this->wallet.active_status.erase (rai_qt::status_types::vulnerable);
+		this->wallet.active_status.erase (fstbt_qt::status_types::vulnerable);
 	}
 }
 
-rai_qt::advanced_actions::advanced_actions (rai_qt::wallet & wallet_a) :
+fstbt_qt::advanced_actions::advanced_actions (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 show_ledger (new QPushButton ("Ledger")),
@@ -1853,7 +1853,7 @@ wallet (wallet_a)
 	enter_block->setToolTip ("Enter block in JSON format");
 }
 
-void rai_qt::advanced_actions::refresh_peers ()
+void fstbt_qt::advanced_actions::refresh_peers ()
 {
 	peers_model->removeRows (0, peers_model->rowCount ());
 	auto list (wallet.node.peers.list_version ());
@@ -1874,7 +1874,7 @@ void rai_qt::advanced_actions::refresh_peers ()
 	peer_count_label->setText (QString ("%1 peers").arg (peers_model->rowCount ()));
 }
 
-void rai_qt::advanced_actions::refresh_ledger ()
+void fstbt_qt::advanced_actions::refresh_ledger ()
 {
 	ledger_model->removeRows (0, ledger_model->rowCount ());
 	rai::transaction transaction (wallet.node.store.environment, false);
@@ -1893,12 +1893,12 @@ void rai_qt::advanced_actions::refresh_ledger ()
 	}
 }
 
-void rai_qt::advanced_actions::refresh_stats ()
+void fstbt_qt::advanced_actions::refresh_stats ()
 {
 	wallet.stats_viewer.refresh_stats ();
 }
 
-rai_qt::block_entry::block_entry (rai_qt::wallet & wallet_a) :
+fstbt_qt::block_entry::block_entry (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 block (new QPlainTextEdit),
@@ -1943,7 +1943,7 @@ wallet (wallet_a)
 	});
 }
 
-rai_qt::block_creation::block_creation (rai_qt::wallet & wallet_a) :
+fstbt_qt::block_creation::block_creation (fstbt_qt::wallet & wallet_a) :
 window (new QWidget),
 layout (new QVBoxLayout),
 group (new QButtonGroup),
@@ -2078,7 +2078,7 @@ wallet (wallet_a)
 	send->click ();
 }
 
-void rai_qt::block_creation::deactivate_all ()
+void fstbt_qt::block_creation::deactivate_all ()
 {
 	account_label->hide ();
 	account->hide ();
@@ -2092,7 +2092,7 @@ void rai_qt::block_creation::deactivate_all ()
 	representative->hide ();
 }
 
-void rai_qt::block_creation::activate_send ()
+void fstbt_qt::block_creation::activate_send ()
 {
 	account_label->show ();
 	account->show ();
@@ -2102,13 +2102,13 @@ void rai_qt::block_creation::activate_send ()
 	destination->show ();
 }
 
-void rai_qt::block_creation::activate_receive ()
+void fstbt_qt::block_creation::activate_receive ()
 {
 	source_label->show ();
 	source->show ();
 }
 
-void rai_qt::block_creation::activate_open ()
+void fstbt_qt::block_creation::activate_open ()
 {
 	source_label->show ();
 	source->show ();
@@ -2116,7 +2116,7 @@ void rai_qt::block_creation::activate_open ()
 	representative->show ();
 }
 
-void rai_qt::block_creation::activate_change ()
+void fstbt_qt::block_creation::activate_change ()
 {
 	account_label->show ();
 	account->show ();
@@ -2124,7 +2124,7 @@ void rai_qt::block_creation::activate_change ()
 	representative->show ();
 }
 
-void rai_qt::block_creation::create_send ()
+void fstbt_qt::block_creation::create_send ()
 {
 	rai::account account_l;
 	auto error (account_l.decode_account (account->text ().toStdString ()));
@@ -2189,7 +2189,7 @@ void rai_qt::block_creation::create_send ()
 	}
 }
 
-void rai_qt::block_creation::create_receive ()
+void fstbt_qt::block_creation::create_receive ()
 {
 	rai::block_hash source_l;
 	auto error (source_l.decode_hex (source->text ().toStdString ()));
@@ -2261,7 +2261,7 @@ void rai_qt::block_creation::create_receive ()
 	}
 }
 
-void rai_qt::block_creation::create_change ()
+void fstbt_qt::block_creation::create_change ()
 {
 	rai::account account_l;
 	auto error (account_l.decode_account (account->text ().toStdString ()));
@@ -2313,7 +2313,7 @@ void rai_qt::block_creation::create_change ()
 	}
 }
 
-void rai_qt::block_creation::create_open ()
+void fstbt_qt::block_creation::create_open ()
 {
 	rai::block_hash source_l;
 	auto error (source_l.decode_hex (source->text ().toStdString ()));
