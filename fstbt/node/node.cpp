@@ -1868,9 +1868,9 @@ stats (config.stat_config)
 	peers.online_weight_minimum = config.online_weight_minimum.number ();
 	if (rai::fstbt_network == rai::fstbt_networks::fstbt_live_network)
 	{
-		extern const char rai_bootstrap_weights[];
-		extern const size_t rai_bootstrap_weights_size;
-		rai::bufferstream weight_stream ((const uint8_t *)rai_bootstrap_weights, rai_bootstrap_weights_size);
+		extern const char fstbt_bootstrap_weights[];
+		extern const size_t fstbt_bootstrap_weights_size;
+		rai::bufferstream weight_stream ((const uint8_t *)fstbt_bootstrap_weights, fstbt_bootstrap_weights_size);
 		rai::uint128_union block_height;
 		if (!rai::read (weight_stream, block_height))
 		{
