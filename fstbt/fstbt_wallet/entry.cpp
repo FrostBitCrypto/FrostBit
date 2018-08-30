@@ -189,7 +189,7 @@ bool update_config (qt_wallet_config & config_a, boost::filesystem::path const &
 
 int run_wallet (QApplication & application, int argc, char * const * argv, boost::filesystem::path const & data_path)
 {
-	rai_qt::eventloop_processor processor;
+	fstbt_qt::eventloop_processor processor;
 	boost::filesystem::create_directories (data_path);
 	QPixmap pixmap (":/logo.png");
 	QSplashScreen * splash = new QSplashScreen (pixmap);
@@ -208,7 +208,7 @@ int run_wallet (QApplication & application, int argc, char * const * argv, boost
 		boost::asio::io_service service;
 		config.node.logging.init (data_path);
 		std::shared_ptr<rai::node> node;
-		std::shared_ptr<rai_qt::wallet> gui;
+		std::shared_ptr<fstbt_qt::wallet> gui;
 		rai::set_application_icon (application);
 		auto opencl (rai::opencl_work::create (config.opencl_enable, config.opencl, config.node.logging));
 		rai::work_pool work (config.node.work_threads, opencl ? [&opencl](rai::uint256_union const & root_a) {
@@ -261,8 +261,8 @@ int run_wallet (QApplication & application, int argc, char * const * argv, boost
 				rpc->stop ();
 				node->stop ();
 			});
-			application.postEvent (&processor, new rai_qt::eventloop_event ([&]() {
-				gui = std::make_shared<rai_qt::wallet> (application, processor, *node, wallet, config.account);
+			application.postEvent (&processor, new fstbt_qt::eventloop_event ([&]() {
+				gui = std::make_shared<fstbt_qt::wallet> (application, processor, *node, wallet, config.account);
 				splash->close ();
 				gui->start ();
 				gui->client_window->show ();
