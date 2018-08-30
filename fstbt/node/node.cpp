@@ -4080,7 +4080,7 @@ void rai::port_mapping::start ()
 
 void rai::port_mapping::refresh_devices ()
 {
-	if (rai::fstbt_network != rai::fstbt_networks::rai_test_network)
+	if (rai::fstbt_network != rai::fstbt_networks::fstbt_test_network)
 	{
 		std::lock_guard<std::mutex> lock (mutex);
 		int discover_error = 0;
