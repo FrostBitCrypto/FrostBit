@@ -35,7 +35,7 @@ add_library (secure
 
 target_link_libraries(secure
 	ed25519
-	rai_lib
+	fstbt_lib
 	lmdb
 	Boost::boost
 	Boost::system
