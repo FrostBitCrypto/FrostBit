@@ -1,8 +1,8 @@
-#include <rai/node/openclwork.hpp>
+#include <fstbt/node/openclwork.hpp>
 
-#include <rai/lib/utility.hpp>
-#include <rai/node/node.hpp>
-#include <rai/node/wallet.hpp>
+#include <fstbt/lib/utility.hpp>
+#include <fstbt/node/node.hpp>
+#include <fstbt/node/wallet.hpp>
 
 #include <array>
 #include <iostream>

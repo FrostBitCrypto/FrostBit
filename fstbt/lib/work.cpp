@@ -1,7 +1,7 @@
-#include <rai/lib/work.hpp>
+#include <fstbt/lib/work.hpp>
 
-#include <rai/lib/blocks.hpp>
-#include <rai/node/xorshift.hpp>
+#include <fstbt/lib/blocks.hpp>
+#include <fstbt/node/xorshift.hpp>
 
 #include <future>
 

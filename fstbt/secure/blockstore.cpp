@@ -1,8 +1,8 @@
 #include <queue>
-#include <rai/node/common.hpp>
-#include <rai/node/wallet.hpp>
-#include <rai/secure/blockstore.hpp>
-#include <rai/secure/versioning.hpp>
+#include <fstbt/node/common.hpp>
+#include <fstbt/node/wallet.hpp>
+#include <fstbt/secure/blockstore.hpp>
+#include <fstbt/secure/versioning.hpp>
 
 #include <boost/polymorphic_cast.hpp>
 

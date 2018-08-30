@@ -1,7 +1,7 @@
-#include <rai/node/cli.hpp>
-#include <rai/node/node.hpp>
-#include <rai/node/testing.hpp>
-#include <rai/rai_node/daemon.hpp>
+#include <fstbt/node/cli.hpp>
+#include <fstbt/node/node.hpp>
+#include <fstbt/node/testing.hpp>
+#include <fstbt/fstbt_node/daemon.hpp>
 
 #include <argon2.h>
 

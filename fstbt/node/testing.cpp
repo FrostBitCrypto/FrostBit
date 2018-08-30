@@ -1,8 +1,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <cstdlib>
-#include <rai/node/common.hpp>
-#include <rai/node/testing.hpp>
+#include <fstbt/node/common.hpp>
+#include <fstbt/node/testing.hpp>
 
 std::string rai::error_system_messages::message (int ev) const
 {

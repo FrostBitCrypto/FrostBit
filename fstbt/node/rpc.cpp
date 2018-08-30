@@ -1,14 +1,14 @@
 #include <boost/algorithm/string.hpp>
-#include <rai/node/rpc.hpp>
+#include <fstbt/node/rpc.hpp>
 
-#include <rai/lib/interface.h>
-#include <rai/node/node.hpp>
+#include <fstbt/lib/interface.h>
+#include <fstbt/node/node.hpp>
 
 #ifdef RAIBLOCKS_SECURE_RPC
-#include <rai/node/rpc_secure.hpp>
+#include <fstbt/node/rpc_secure.hpp>
 #endif
 
-#include <rai/lib/errors.hpp>
+#include <fstbt/lib/errors.hpp>
 
 rai::rpc_secure_config::rpc_secure_config () :
 enable (false),

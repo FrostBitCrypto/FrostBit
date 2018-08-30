@@ -1,7 +1,7 @@
-#include <rai/node/bootstrap.hpp>
+#include <fstbt/node/bootstrap.hpp>
 
-#include <rai/node/common.hpp>
-#include <rai/node/node.hpp>
+#include <fstbt/node/common.hpp>
+#include <fstbt/node/node.hpp>
 
 #include <boost/log/trivial.hpp>
 

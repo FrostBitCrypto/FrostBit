@@ -1,8 +1,8 @@
-#include <rai/node/wallet.hpp>
+#include <fstbt/node/wallet.hpp>
 
-#include <rai/node/node.hpp>
-#include <rai/node/wallet.hpp>
-#include <rai/node/xorshift.hpp>
+#include <fstbt/node/node.hpp>
+#include <fstbt/node/wallet.hpp>
+#include <fstbt/node/xorshift.hpp>
 
 #include <argon2.h>
 

@@ -1,8 +1,8 @@
-#include <rai/node/node.hpp>
+#include <fstbt/node/node.hpp>
 
-#include <rai/lib/interface.h>
-#include <rai/node/common.hpp>
-#include <rai/node/rpc.hpp>
+#include <fstbt/lib/interface.h>
+#include <fstbt/node/common.hpp>
+#include <fstbt/node/rpc.hpp>
 
 #include <algorithm>
 #include <future>

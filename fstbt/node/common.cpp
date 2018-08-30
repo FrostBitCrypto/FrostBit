@@ -1,8 +1,8 @@
 
-#include <rai/node/common.hpp>
+#include <fstbt/node/common.hpp>
 
-#include <rai/lib/work.hpp>
-#include <rai/node/wallet.hpp>
+#include <fstbt/lib/work.hpp>
+#include <fstbt/node/wallet.hpp>
 
 std::array<uint8_t, 2> constexpr rai::message_header::magic_number;
 size_t constexpr rai::message_header::ipv4_only_position;

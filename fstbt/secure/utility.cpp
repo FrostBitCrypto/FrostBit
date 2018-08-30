@@ -1,7 +1,7 @@
-#include <rai/secure/utility.hpp>
+#include <fstbt/secure/utility.hpp>
 
-#include <rai/lib/interface.h>
-#include <rai/node/working.hpp>
+#include <fstbt/lib/interface.h>
+#include <fstbt/node/working.hpp>
 
 static std::vector<boost::filesystem::path> all_unique_paths;
 

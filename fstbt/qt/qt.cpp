@@ -1,4 +1,4 @@
-#include <rai/qt/qt.hpp>
+#include <fstbt/qt/qt.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/property_tree/json_parser.hpp>
