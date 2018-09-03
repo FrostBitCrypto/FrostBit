@@ -59,7 +59,7 @@ void rai::uint256_union::encode_account (std::string & destination_a) const
 		number_l >>= 5;
 		destination_a.push_back (account_encode (r));
 	}
-	destination_a.append ("_brx"); // ice_
+	destination_a.append ("_eci"); // ice_
 	std::reverse (destination_a.begin (), destination_a.end ());
 }
 
