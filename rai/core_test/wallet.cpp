@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <fstream>
-#include <rai/core_test/testutil.hpp>
-#include <rai/node/testing.hpp>
+#include <fstbt/core_test/testutil.hpp>
+#include <fstbt/node/testing.hpp>
 
 using namespace std::chrono_literals;
 
@@ -871,8 +871,8 @@ TEST (wallet, send_race)
 	rai::keypair key2;
 	for (auto i (1); i < 60; ++i)
 	{
-		ASSERT_NE (nullptr, system.wallet (0)->send_action (rai::test_genesis_key.pub, key2.pub, rai::Gxrb_ratio));
-		ASSERT_EQ (rai::genesis_amount - rai::Gxrb_ratio * i, system.nodes[0]->balance (rai::test_genesis_key.pub));
+		ASSERT_NE (nullptr, system.wallet (0)->send_action (rai::test_genesis_key.pub, key2.pub, rai::GICE_ratio));
+		ASSERT_EQ (rai::genesis_amount - rai::GICE_ratio * i, system.nodes[0]->balance (rai::test_genesis_key.pub));
 	}
 }
 
