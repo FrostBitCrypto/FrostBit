@@ -1,4 +1,4 @@
-## Raiblocks CI config
+## FrostBit CI config
 
 image: ubuntu:xenial
 

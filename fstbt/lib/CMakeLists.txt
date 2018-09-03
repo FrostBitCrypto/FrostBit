@@ -38,7 +38,7 @@ target_compile_definitions(fstbt_lib
 		-DACTIVE_NETWORK=${ACTIVE_NETWORK}
 )
 
-if (RAIBLOCKS_GUI AND NOT APPLE)
+if (FROSTBIT_GUI AND NOT APPLE)
 	install(TARGETS fstbt_lib
 			RUNTIME DESTINATION bin
 			LIBRARY DESTINATION lib

@@ -5,10 +5,10 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/thread.hpp>
-#include <rai/core_test/testutil.hpp>
-#include <rai/node/common.hpp>
-#include <rai/node/rpc.hpp>
-#include <rai/node/testing.hpp>
+#include <fstbt/core_test/testutil.hpp>
+#include <fstbt/node/common.hpp>
+#include <fstbt/node/rpc.hpp>
+#include <fstbt/node/testing.hpp>
 
 using namespace std::chrono_literals;
 
@@ -913,7 +913,7 @@ TEST (rpc, history)
 	ASSERT_NE (nullptr, receive);
 	auto node0 (system.nodes[0]);
 	rai::genesis genesis;
-	rai::state_block usend (rai::genesis_account, node0->latest (rai::genesis_account), rai::genesis_account, rai::genesis_amount - rai::Gxrb_ratio, rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+	rai::state_block usend (rai::genesis_account, node0->latest (rai::genesis_account), rai::genesis_account, rai::genesis_amount - rai::Gice_ratio, rai::genesis_account, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	rai::state_block ureceive (rai::genesis_account, usend.hash (), rai::genesis_account, rai::genesis_amount, usend.hash (), rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	rai::state_block uchange (rai::genesis_account, ureceive.hash (), rai::keypair ().pub, rai::genesis_amount, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	{
@@ -944,12 +944,12 @@ TEST (rpc, history)
 	ASSERT_EQ ("receive", std::get<0> (history_l[0]));
 	ASSERT_EQ (ureceive.hash ().to_string (), std::get<3> (history_l[0]));
 	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<1> (history_l[0]));
-	ASSERT_EQ (rai::Gxrb_ratio.convert_to<std::string> (), std::get<2> (history_l[0]));
+	ASSERT_EQ (rai::Gice_ratio.convert_to<std::string> (), std::get<2> (history_l[0]));
 	ASSERT_EQ (5, history_l.size ());
 	ASSERT_EQ ("send", std::get<0> (history_l[1]));
 	ASSERT_EQ (usend.hash ().to_string (), std::get<3> (history_l[1]));
 	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<1> (history_l[1]));
-	ASSERT_EQ (rai::Gxrb_ratio.convert_to<std::string> (), std::get<2> (history_l[1]));
+	ASSERT_EQ (rai::Gice_ratio.convert_to<std::string> (), std::get<2> (history_l[1]));
 	ASSERT_EQ ("receive", std::get<0> (history_l[2]));
 	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<1> (history_l[2]));
 	ASSERT_EQ (system.nodes[0]->config.receive_minimum.to_string_dec (), std::get<2> (history_l[2]));
@@ -1313,7 +1313,7 @@ TEST (rpc, payment_wait)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "payment_wait");
 	request1.put ("account", key.pub.to_account ());
-	request1.put ("amount", rai::amount (rai::Mxrb_ratio).to_string_dec ());
+	request1.put ("amount", rai::amount (rai::Mice_ratio).to_string_dec ());
 	request1.put ("timeout", "100");
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
@@ -1323,9 +1323,9 @@ TEST (rpc, payment_wait)
 	ASSERT_EQ (200, response1.status);
 	ASSERT_EQ ("nothing", response1.json.get<std::string> ("status"));
 	request1.put ("timeout", "100000");
-	system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Mxrb_ratio);
+	system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Mice_ratio);
 	system.alarm.add (std::chrono::steady_clock::now () + std::chrono::milliseconds (500), [&]() {
-		system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Mxrb_ratio);
+		system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Mice_ratio);
 	});
 	test_response response2 (request1, rpc, system.service);
 	while (response2.status == 0)
@@ -1334,7 +1334,7 @@ TEST (rpc, payment_wait)
 	}
 	ASSERT_EQ (200, response2.status);
 	ASSERT_EQ ("success", response2.json.get<std::string> ("status"));
-	request1.put ("amount", rai::amount (rai::Mxrb_ratio * 2).to_string_dec ());
+	request1.put ("amount", rai::amount (rai::Mice_ratio * 2).to_string_dec ());
 	test_response response3 (request1, rpc, system.service);
 	while (response3.status == 0)
 	{
@@ -1514,7 +1514,7 @@ TEST (rpc, version)
 		rai::transaction transaction (system.nodes[0]->store.environment, false);
 		ASSERT_EQ (std::to_string (node1->store.version_get (transaction)), response1.json.get<std::string> ("store_version"));
 	}
-	ASSERT_EQ (boost::str (boost::format ("RaiBlocks %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
+	ASSERT_EQ (boost::str (boost::format ("FrostBit %1%.%2%") % FROSTBIT_VERSION_MAJOR % FROSTBIT_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
 	auto headers (response1.resp.base ());
 	auto allowed_origin (headers.at ("Access-Control-Allow-Origin"));
 	auto allowed_headers (headers.at ("Access-Control-Allow-Headers"));
@@ -1761,7 +1761,7 @@ TEST (rpc, available_supply)
 	ASSERT_EQ ("1", response3.json.get<std::string> ("available"));
 }
 
-TEST (rpc, mrai_to_raw)
+TEST (rpc, mice_to_raw)
 {
 	rai::system system (24000, 1);
 	rai::node_init init1;
@@ -1769,7 +1769,7 @@ TEST (rpc, mrai_to_raw)
 	rai::rpc rpc (system.service, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "mrai_to_raw");
+	request1.put ("action", "mice_to_raw");
 	request1.put ("amount", "1");
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
@@ -1777,10 +1777,10 @@ TEST (rpc, mrai_to_raw)
 		system.poll ();
 	}
 	ASSERT_EQ (200, response1.status);
-	ASSERT_EQ (rai::Mxrb_ratio.convert_to<std::string> (), response1.json.get<std::string> ("amount"));
+	ASSERT_EQ (rai::Mice_ratio.convert_to<std::string> (), response1.json.get<std::string> ("amount"));
 }
 
-TEST (rpc, mrai_from_raw)
+TEST (rpc, mice_from_raw)
 {
 	rai::system system (24000, 1);
 	rai::node_init init1;
@@ -1788,8 +1788,8 @@ TEST (rpc, mrai_from_raw)
 	rai::rpc rpc (system.service, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "mrai_from_raw");
-	request1.put ("amount", rai::Mxrb_ratio.convert_to<std::string> ());
+	request1.put ("action", "mice_from_raw");
+	request1.put ("amount", rai::Mice_ratio.convert_to<std::string> ());
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
 	{
@@ -1799,7 +1799,7 @@ TEST (rpc, mrai_from_raw)
 	ASSERT_EQ ("1", response1.json.get<std::string> ("amount"));
 }
 
-TEST (rpc, krai_to_raw)
+TEST (rpc, kice_to_raw)
 {
 	rai::system system (24000, 1);
 	rai::node_init init1;
@@ -1807,7 +1807,7 @@ TEST (rpc, krai_to_raw)
 	rai::rpc rpc (system.service, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "krai_to_raw");
+	request1.put ("action", "kice_to_raw");
 	request1.put ("amount", "1");
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
@@ -1815,10 +1815,10 @@ TEST (rpc, krai_to_raw)
 		system.poll ();
 	}
 	ASSERT_EQ (200, response1.status);
-	ASSERT_EQ (rai::kxrb_ratio.convert_to<std::string> (), response1.json.get<std::string> ("amount"));
+	ASSERT_EQ (rai::kice_ratio.convert_to<std::string> (), response1.json.get<std::string> ("amount"));
 }
 
-TEST (rpc, krai_from_raw)
+TEST (rpc, kice_from_raw)
 {
 	rai::system system (24000, 1);
 	rai::node_init init1;
@@ -1826,8 +1826,8 @@ TEST (rpc, krai_from_raw)
 	rai::rpc rpc (system.service, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "krai_from_raw");
-	request1.put ("amount", rai::kxrb_ratio.convert_to<std::string> ());
+	request1.put ("action", "kice_from_raw");
+	request1.put ("amount", rai::kice_ratio.convert_to<std::string> ());
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
 	{
@@ -1837,7 +1837,7 @@ TEST (rpc, krai_from_raw)
 	ASSERT_EQ ("1", response1.json.get<std::string> ("amount"));
 }
 
-TEST (rpc, rai_to_raw)
+TEST (rpc, ice_to_raw)
 {
 	rai::system system (24000, 1);
 	rai::node_init init1;
@@ -1845,7 +1845,7 @@ TEST (rpc, rai_to_raw)
 	rai::rpc rpc (system.service, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "rai_to_raw");
+	request1.put ("action", "ice_to_raw");
 	request1.put ("amount", "1");
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
@@ -1853,10 +1853,10 @@ TEST (rpc, rai_to_raw)
 		system.poll ();
 	}
 	ASSERT_EQ (200, response1.status);
-	ASSERT_EQ (rai::xrb_ratio.convert_to<std::string> (), response1.json.get<std::string> ("amount"));
+	ASSERT_EQ (rai::ice_ratio.convert_to<std::string> (), response1.json.get<std::string> ("amount"));
 }
 
-TEST (rpc, rai_from_raw)
+TEST (rpc, ice_from_raw)
 {
 	rai::system system (24000, 1);
 	rai::node_init init1;
@@ -1864,8 +1864,8 @@ TEST (rpc, rai_from_raw)
 	rai::rpc rpc (system.service, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "rai_from_raw");
-	request1.put ("amount", rai::xrb_ratio.convert_to<std::string> ());
+	request1.put ("action", "ice_from_raw");
+	request1.put ("amount", rai::ice_ratio.convert_to<std::string> ());
 	test_response response1 (request1, rpc, system.service);
 	while (response1.status == 0)
 	{
@@ -3301,7 +3301,7 @@ TEST (rpc, block_create_state)
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
 	request.put ("previous", genesis.hash ().to_string ());
 	request.put ("representative", rai::test_genesis_key.pub.to_account ());
-	request.put ("balance", (rai::genesis_amount - rai::Gxrb_ratio).convert_to<std::string> ());
+	request.put ("balance", (rai::genesis_amount - rai::Gice_ratio).convert_to<std::string> ());
 	request.put ("link", key.pub.to_account ());
 	request.put ("work", rai::to_string_hex (system.nodes[0]->work_generate_blocking (genesis.hash ())));
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
@@ -3331,7 +3331,7 @@ TEST (rpc, block_create_state_open)
 	rai::keypair key;
 	rai::genesis genesis;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto send_block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Gxrb_ratio));
+	auto send_block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, rai::Gice_ratio));
 	ASSERT_NE (nullptr, send_block);
 	boost::property_tree::ptree request;
 	request.put ("action", "block_create");
@@ -3340,7 +3340,7 @@ TEST (rpc, block_create_state_open)
 	request.put ("account", key.pub.to_account ());
 	request.put ("previous", 0);
 	request.put ("representative", rai::test_genesis_key.pub.to_account ());
-	request.put ("balance", rai::Gxrb_ratio.convert_to<std::string> ());
+	request.put ("balance", rai::Gice_ratio.convert_to<std::string> ());
 	request.put ("link", send_block->hash ().to_string ());
 	request.put ("work", rai::to_string_hex (system.nodes[0]->work_generate_blocking (send_block->hash ())));
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
@@ -3386,7 +3386,7 @@ TEST (rpc, block_create_state_request_work)
 		request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 		request.put ("account", rai::test_genesis_key.pub.to_account ());
 		request.put ("representative", rai::test_genesis_key.pub.to_account ());
-		request.put ("balance", (rai::genesis_amount - rai::Gxrb_ratio).convert_to<std::string> ());
+		request.put ("balance", (rai::genesis_amount - rai::Gice_ratio).convert_to<std::string> ());
 		request.put ("link", key.pub.to_account ());
 		request.put ("previous", previous);
 		rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
@@ -3599,7 +3599,7 @@ TEST (rpc, online_reps)
 	rai::system system (24000, 2);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	ASSERT_TRUE (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ());
-	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gxrb_ratio);
+	system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gice_ratio);
 	system.deadline_set (10s);
 	while (system.nodes[1]->online_reps.online_stake () == system.nodes[1]->config.online_weight_minimum.number ())
 	{
@@ -3626,7 +3626,7 @@ TEST (rpc, confirmation_history)
 {
 	rai::system system (24000, 1);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto block (system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gxrb_ratio));
+	auto block (system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, rai::Gice_ratio));
 	ASSERT_TRUE (system.nodes[0]->active.confirmed.empty ());
 	system.deadline_set (10s);
 	while (system.nodes[0]->active.confirmed.empty ())
@@ -3651,7 +3651,7 @@ TEST (rpc, confirmation_history)
 	ASSERT_EQ (block->hash ().to_string (), hash);
 	rai::amount tally_num;
 	tally_num.decode_dec (tally);
-	assert (tally_num == rai::genesis_amount || tally_num == (rai::genesis_amount - rai::Gxrb_ratio));
+	assert (tally_num == rai::genesis_amount || tally_num == (rai::genesis_amount - rai::Gice_ratio));
 	system.stop ();
 }
 
@@ -3661,7 +3661,7 @@ TEST (rpc, block_confirm)
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	rai::genesis genesis;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto send1 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.nodes[0]->work_generate_blocking (genesis.hash ())));
+	auto send1 (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gice_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.nodes[0]->work_generate_blocking (genesis.hash ())));
 	{
 		rai::transaction transaction (system.nodes[0]->store.environment, true);
 		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->ledger.process (transaction, *send1).code);

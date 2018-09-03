@@ -20,12 +20,12 @@ case "${network}" in
                 ;;
 esac
 
-nanodir="${HOME}/RaiBlocks${dirSuffix}"
+nanodir="${HOME}/FrostBit${dirSuffix}"
 dbFile="${nanodir}/data.ldb"
 mkdir -p "${nanodir}"
 if [ ! -f "${nanodir}/config.json" ]; then
         echo "Config File not found, adding default."
-        cp "/usr/share/raiblocks/config/${network}.json" "${nanodir}/config.json"
+        cp "/usr/share/frostbit/config/${network}.json" "${nanodir}/config.json"
 fi
 
 pid=''

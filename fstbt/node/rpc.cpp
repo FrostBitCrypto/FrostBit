@@ -1866,7 +1866,7 @@ void rai::rpc_handler::ledger ()
 	response_errors ();
 }
 
-void rai::rpc_handler::mrai_from_raw (rai::uint128_t ratio)
+void rai::rpc_handler::mice_from_raw (rai::uint128_t ratio)
 {
 	auto amount (amount_impl ());
 	if (!ec)
@@ -1877,7 +1877,7 @@ void rai::rpc_handler::mrai_from_raw (rai::uint128_t ratio)
 	response_errors ();
 }
 
-void rai::rpc_handler::mrai_to_raw (rai::uint128_t ratio)
+void rai::rpc_handler::mice_to_raw (rai::uint128_t ratio)
 {
 	auto amount (amount_impl ());
 	if (!ec)
@@ -2787,7 +2787,7 @@ void rai::rpc_handler::version ()
 {
 	response_l.put ("rpc_version", "1");
 	response_l.put ("store_version", std::to_string (node.store_version ()));
-	response_l.put ("node_vendor", boost::str (boost::format ("FrostBit %1%.%2%") % RAIBLOCKS_VERSION_MAJOR % RAIBLOCKS_VERSION_MINOR));
+	response_l.put ("node_vendor", boost::str (boost::format ("FrostBit %1%.%2%") % FROSTBIT_VERSION_MAJOR % FROSTBIT_VERSION_MINOR));
 	response_errors ();
 }
 
@@ -3741,25 +3741,25 @@ void rai::rpc_handler::process_request ()
 			{
 				key_expand ();
 			}
-			else if (action == "krai_from_raw")
+			else if (action == "kice_from_raw")
 			{
-				mrai_from_raw (rai::kxrb_ratio);
+				mice_from_raw (rai::kice_ratio);
 			}
-			else if (action == "krai_to_raw")
+			else if (action == "kice_to_raw")
 			{
-				mrai_to_raw (rai::kxrb_ratio);
+				mice_to_raw (rai::kice_ratio);
 			}
 			else if (action == "ledger")
 			{
 				ledger ();
 			}
-			else if (action == "mrai_from_raw")
+			else if (action == "mice_from_raw")
 			{
-				mrai_from_raw ();
+				mice_from_raw ();
 			}
-			else if (action == "mrai_to_raw")
+			else if (action == "mice_to_raw")
 			{
-				mrai_to_raw ();
+				mice_to_raw ();
 			}
 			else if (action == "password_change")
 			{
@@ -3805,13 +3805,13 @@ void rai::rpc_handler::process_request ()
 			{
 				process ();
 			}
-			else if (action == "rai_from_raw")
+			else if (action == "ice_from_raw")
 			{
-				mrai_from_raw (rai::xrb_ratio);
+				mice_from_raw (rai::ice_ratio);
 			}
-			else if (action == "rai_to_raw")
+			else if (action == "ice_to_raw")
 			{
-				mrai_to_raw (rai::xrb_ratio);
+				mice_to_raw (rai::ice_ratio);
 			}
 			else if (action == "receive")
 			{
