@@ -1777,8 +1777,8 @@ wallet (wallet_a)
 			this->wallet.change_rendering_ratio (rai::kice_ratio);
 		}
 	});
-	QObject::connect (rai, &QRadioButton::toggled, [this]() {
-		if (rai->isChecked ())
+	QObject::connect (ice, &QRadioButton::toggled, [this]() {
+		if (ice->isChecked ())
 		{
 			this->wallet.change_rendering_ratio (rai::ice_ratio);
 		}
