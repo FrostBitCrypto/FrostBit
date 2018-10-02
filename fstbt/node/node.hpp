@@ -62,7 +62,7 @@ public:
 	rai::election_vote_result vote (rai::account, uint64_t, rai::block_hash);
 	rai::tally_t tally (MDB_txn *);
 	// Check if we have vote quorum
-	bool have_quorum (rai::tally_t const &);
+	bool have_quorum (rai::tally_t const &, rai::uint128_t);
 	// Change our winner to agree with the network
 	void compute_rep_votes (MDB_txn *);
 	// Confirm this block if quorum is met
@@ -375,6 +375,7 @@ public:
 	void vote (std::shared_ptr<rai::vote> const &);
 	void recalculate_stake ();
 	rai::uint128_t online_stake ();
+	rai::uint128_t online_stake_total;
 	std::deque<rai::account> list ();
 	boost::multi_index_container<
 	rai::rep_last_heard_info,
@@ -384,20 +385,71 @@ public:
 	reps;
 
 private:
-	rai::uint128_t online_stake_total;
 	std::mutex mutex;
 	rai::node & node;
+};
+class udp_data
+{
+public:
+	uint8_t * buffer;
+	size_t size;
+	rai::endpoint endpoint;
+};
+/**
+  * A circular buffer for servicing UDP datagrams. This container follows a producer/consumer model where the operating system is producing data in to buffers which are serviced by internal threads.
+  * If buffers are not serviced fast enough they're internally dropped.
+  * This container has a maximum space to hold N buffers of M size and will allocate them in round-robin order.
+  * All public methods are thread-safe
+*/
+class udp_buffer
+{
+public:
+	// Size - Size of each individual buffer
+	// Count - Number of buffers to allocate
+	// Stats - Statistics
+	udp_buffer (rai::stat & stats, size_t, size_t);
+	// Return a buffer where UDP data can be put
+	// Method will attempt to return the first free buffer
+	// If there are no free buffers, an unserviced buffer will be dequeued and returned
+	// Function will block if there are no free or unserviced buffers
+	// Return nullptr if the container has stopped
+	rai::udp_data * allocate ();
+	// Queue a buffer that has been filled with UDP data and notify servicing threads
+	void enqueue (rai::udp_data *);
+	// Return a buffer that has been filled with UDP data
+	// Function will block until a buffer has been added
+	// Return nullptr if the container has stopped
+	rai::udp_data * dequeue ();
+	// Return a buffer to the freelist after is has been serviced
+	void release (rai::udp_data *);
+	// Stop container and notify waiting threads
+	void stop ();
+
+private:
+	rai::stat & stats;
+	std::mutex mutex;
+	std::condition_variable condition;
+	boost::circular_buffer<rai::udp_data *> free;
+	boost::circular_buffer<rai::udp_data *> full;
+	std::vector<uint8_t> slab;
+	std::vector<rai::udp_data> entries;
+	bool stopped;
 };
 class network
 {
 public:
 	network (rai::node &, uint16_t);
+	~network ();
 	void receive ();
+	void process_packets ();
+	void start ();
 	void stop ();
-	void receive_action (boost::system::error_code const &, size_t);
+	void receive_action (rai::udp_data *);
 	void rpc_action (boost::system::error_code const &, size_t);
 	void republish_vote (std::shared_ptr<rai::vote>);
 	void republish_block (MDB_txn *, std::shared_ptr<rai::block>, bool = true);
+	static unsigned const broadcast_interval_ms = (rai::fstbt_network == rai::fstbt_networks::fstbt_test_network) ? 10 : 50;
+	void republish_block_batch (std::deque<std::shared_ptr<rai::block>>, unsigned = broadcast_interval_ms);
 	void republish (rai::block_hash const &, std::shared_ptr<std::vector<uint8_t>>, rai::endpoint);
 	void publish_broadcast (std::vector<rai::peer_information> &, std::unique_ptr<rai::block>);
 	void confirm_send (rai::confirm_ack const &, std::shared_ptr<std::vector<uint8_t>>, rai::endpoint const &);
@@ -409,14 +461,15 @@ public:
 	void send_confirm_req (rai::endpoint const &, std::shared_ptr<rai::block>);
 	void send_buffer (uint8_t const *, size_t, rai::endpoint const &, std::function<void(boost::system::error_code const &, size_t)>);
 	rai::endpoint endpoint ();
-	rai::endpoint remote;
-	std::array<uint8_t, 512> buffer;
+	rai::udp_buffer buffer_container;
 	boost::asio::ip::udp::socket socket;
 	std::mutex socket_mutex;
 	boost::asio::ip::udp::resolver resolver;
+	std::vector<std::thread> packet_processing_threads;
 	rai::node & node;
 	bool on;
 	static uint16_t const node_port = rai::fstbt_network == rai::fstbt_networks::fstbt_live_network ? 7075 : 54000;
+	static size_t const buffer_size = 512;
 };
 class logging
 {
@@ -512,7 +565,7 @@ class node_observers
 public:
 	rai::observer_set<std::shared_ptr<rai::block>, rai::account const &, rai::uint128_t const &, bool> blocks;
 	rai::observer_set<bool> wallet;
-	rai::observer_set<std::shared_ptr<rai::vote>, rai::endpoint const &> vote;
+	rai::observer_set<MDB_txn *, std::shared_ptr<rai::vote>, rai::endpoint const &> vote;
 	rai::observer_set<rai::account const &, bool> account_balance;
 	rai::observer_set<rai::endpoint const &> endpoint;
 	rai::observer_set<> disconnect;
@@ -574,6 +627,7 @@ private:
 	std::deque<std::pair<std::shared_ptr<rai::block>, std::chrono::steady_clock::time_point>> blocks;
 	std::unordered_set<rai::block_hash> blocks_hashes;
 	std::deque<std::shared_ptr<rai::block>> forced;
+	std::deque<std::shared_ptr<rai::block>> processed_active;
 	std::condition_variable condition;
 	rai::node & node;
 	std::mutex mutex;
@@ -620,6 +674,7 @@ public:
 	void add_initial_peers ();
 	void block_confirm (std::shared_ptr<rai::block>);
 	void process_fork (MDB_txn *, std::shared_ptr<rai::block>);
+	bool validate_block_by_previous (rai::transaction const &, std::shared_ptr<rai::block>);
 	rai::uint128_t delta ();
 	boost::asio::io_service & service;
 	rai::node_config config;

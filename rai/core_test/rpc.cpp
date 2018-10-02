@@ -1146,7 +1146,11 @@ TEST (rpc, payment_begin_end)
 	rai::uint256_union account;
 	ASSERT_FALSE (account.decode_account (account_text));
 	ASSERT_TRUE (wallet->exists (account));
-	auto root1 (system.nodes[0]->ledger.latest_root (rai::transaction (wallet->wallets.environment, false), account));
+	rai::block_hash root1;
+	{
+		rai::transaction transaction (node1->store.environment, false);
+		root1 = node1->ledger.latest_root (transaction, account);
+	}
 	uint64_t work (0);
 	while (!rai::work_validate (root1, work))
 	{
@@ -1157,7 +1161,8 @@ TEST (rpc, payment_begin_end)
 	while (rai::work_validate (root1, work))
 	{
 		auto ec = system.poll ();
-		ASSERT_FALSE (wallet->store.work_get (rai::transaction (wallet->wallets.environment, false), account, work));
+		rai::transaction transaction (wallet->wallets.environment, false);
+		ASSERT_FALSE (wallet->store.work_get (transaction, account, work));
 		ASSERT_NO_ERROR (ec);
 	}
 	ASSERT_EQ (wallet->free_accounts.end (), wallet->free_accounts.find (account));
@@ -1368,6 +1373,10 @@ TEST (rpc, pending)
 	rai::keypair key1;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	auto block1 (system.wallet (0)->send_action (rai::test_genesis_key.pub, key1.pub, 100));
+	while (system.nodes[0]->active.active (*block1))
+	{
+		system.poll ();
+	}
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
@@ -2509,6 +2518,10 @@ TEST (rpc, pending_exists)
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	auto hash0 (system.nodes[0]->latest (rai::genesis_account));
 	auto block1 (system.wallet (0)->send_action (rai::test_genesis_key.pub, key1.pub, 100));
+	while (system.nodes[0]->active.active (*block1))
+	{
+		system.poll ();
+	}
 	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
