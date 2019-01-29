@@ -1021,22 +1021,15 @@ lmdb_max_dbs (128)
 			break;
 		case rai::fstbt_networks::fstbt_beta_network:
 			preconfigured_peers.push_back ("beta.frostbit.info");
-			preconfigured_representatives.push_back (rai::account ("A59A47CC4F593E75AE9AD653FDA9358E2F7898D9ACC8C60E80D0495CE20FBA9F"));
-			preconfigured_representatives.push_back (rai::account ("259A4011E6CAD1069A97C02C3C1F2AAA32BC093C8D82EE1334F937A4BE803071"));
-			preconfigured_representatives.push_back (rai::account ("259A40656144FAA16D2A8516F7BE9C74A63C6CA399960EDB747D144ABB0F7ABD"));
-			preconfigured_representatives.push_back (rai::account ("259A40A92FA42E2240805DE8618EC4627F0BA41937160B4CFF7F5335FD1933DF"));
-			preconfigured_representatives.push_back (rai::account ("259A40FF3262E273EC451E873C4CDF8513330425B38860D882A16BCC74DA9B73"));
+			preconfigured_representatives.push_back (rai::account ("F78E3373943BE878A5742CD8377A3958C74CEB9A27EFC79ED4A4A2C8CC87FA01"));
+			preconfigured_representatives.push_back (rai::account ("BB25FD12F02EECED623702592137605A1C1A8160D1DF11B6FC0FF2E4FB6D39EC"));
+			preconfigured_representatives.push_back (rai::account ("6EF456B3038EE6CB6C931D593E047C41C668BD70A11C68B3DEF3587CCCC86048"));
 			break;
 		case rai::fstbt_networks::fstbt_live_network:
 			preconfigured_peers.push_back ("prod.frostbit.info");
-			preconfigured_representatives.push_back (rai::account ("A30E0A32ED41C8607AA9212843392E853FCBCB4E7CB194E35C94F07F91DE59EF"));
-			preconfigured_representatives.push_back (rai::account ("67556D31DDFC2A440BF6147501449B4CB9572278D034EE686A6BEE29851681DF"));
-			preconfigured_representatives.push_back (rai::account ("5C2FBB148E006A8E8BA7A75DD86C9FE00C83F5FFDBFD76EAA09531071436B6AF"));
-			preconfigured_representatives.push_back (rai::account ("AE7AC63990DAAAF2A69BF11C913B928844BF5012355456F2F164166464024B29"));
-			preconfigured_representatives.push_back (rai::account ("BD6267D6ECD8038327D2BCC0850BDF8F56EC0414912207E81BCF90DFAC8A4AAA"));
-			preconfigured_representatives.push_back (rai::account ("2399A083C600AA0572F5E36247D978FCFC840405F8D4B6D33161C0066A55F431"));
-			preconfigured_representatives.push_back (rai::account ("2298FAB7C61058E77EA554CB93EDEEDA0692CBFCC540AB213B2836B29029E23A"));
-			preconfigured_representatives.push_back (rai::account ("3FE80B4BC842E82C1C18ABFEEC47EA989E63953BC82AC411F304D13833D52A56"));
+			preconfigured_representatives.push_back (rai::account ("FFDC5AFA0F336584A0E8C29678C1C06D8CC5346296F046B08F4700ACE37D62BF"));
+			preconfigured_representatives.push_back (rai::account ("6A09FABA9CF9A43C3F498F39ADEAEA9C2FC7B2F1FD7691A0D0952F8AFAE4A6C7"));
+			preconfigured_representatives.push_back (rai::account ("0EF0FB8C9ACCA4964C766F8EB9F88F94785396CD6B44521E25F2AD271B8F41B2"));
 			// 2018-09-01 UTC 00:00 in unix time
 			// Technically, time_t is never defined to be unix time, but compilers implement it as such
 			generate_hash_votes_at = std::chrono::system_clock::from_time_t (1535760000);
