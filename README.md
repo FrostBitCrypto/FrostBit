@@ -4,8 +4,8 @@
 </div>
 <hr />
 
-[![Build Status](https://travis-ci.org/FrostBitCrypto/raiblocks.svg?branch=master)](https://travis-ci.org/FrostBitCrypto/raiblocks)
-[![Build status](https://ci.appveyor.com/api/projects/status/q66rbt2ux6apjj03/branch/master?svg=true)](https://ci.appveyor.com/project/argakiig/raiblocks/branch/master)
+[![Build Status](https://travis-ci.org/FrostBitCrypto/FrostBit.svg?branch=master)](https://travis-ci.org/FrostBitCrypto/frostbit)
+[![Build status](https://ci.appveyor.com/api/projects/status/a9yu2qcl2v9agtry?svg=true)](https://ci.appveyor.com/project/FrostBitDave/frostbit/branch/master)
 ### What is FrostBit?
 
 ---

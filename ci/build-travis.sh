@@ -23,7 +23,7 @@ fi
 
 cmake \
     -G'Unix Makefiles' \
-    -DACTIVE_NETWORK=rai_test_network \
+    -DACTIVE_NETWORK=fstbt_test_network \
     -DFROSTBIT_TEST=ON \
     -DFROSTBIT_GUI=ON \
     -DCMAKE_BUILD_TYPE=Debug \
