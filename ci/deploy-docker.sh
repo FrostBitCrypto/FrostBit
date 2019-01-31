@@ -7,7 +7,7 @@ echo "$DOCKER_PASSWORD" | docker login -u frostbit --password-stdin
 
 # We push this just so it can be a cache next time
 if [ "$TRAVIS_BRANCH" = "master" ]; then
-    "$scripts"/custom-timeout.sh 30 docker push frostbit/frostbit-ci
+    "$scripts"/custom-timeout.sh 30 docker push frostbitdev/frostbit
 fi
 
 tags=()
