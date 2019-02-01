@@ -6,7 +6,7 @@ export PATH
 set -euo pipefail
 IFS=$'\n\t'
 
-network="$(cat /etc/nano-network)"
+network="$(cat /etc/fstbt-network)"
 case "${network}" in
         live|'')
                 network='live'
@@ -20,12 +20,12 @@ case "${network}" in
                 ;;
 esac
 
-nanodir="${HOME}/FrostBit${dirSuffix}"
-dbFile="${nanodir}/data.ldb"
-mkdir -p "${nanodir}"
-if [ ! -f "${nanodir}/config.json" ]; then
+fstbtdir="${HOME}/FrostBit${dirSuffix}"
+dbFile="${fstbtdir}/data.ldb"
+mkdir -p "${fstbtdir}"
+if [ ! -f "${fstbtdir}/config.json" ]; then
         echo "Config File not found, adding default."
-        cp "/usr/share/frostbit/config/${network}.json" "${nanodir}/config.json"
+        cp "/usr/share/frostbit/config/${network}.json" "${fstbtdir}/config.json"
 fi
 
 pid=''
@@ -48,7 +48,7 @@ while true; do
 				fi
 			done
 
-			rai_node --vacuum
+			fstbt_node --vacuum
 		fi
 	fi
 
@@ -59,7 +59,7 @@ while true; do
 	fi
 
 	if [ -z "${pid}" ]; then
-		rai_node --daemon &
+		fstbt_node --daemon &
 		pid="$!"
 	fi
 done
