@@ -3,7 +3,6 @@ add_executable (core_test
 	block.cpp
 	block_store.cpp
 	interface.cpp
-	ipc.cpp
 	conflicts.cpp
 	daemon.cpp
 	entry.cpp
@@ -16,8 +15,6 @@ add_executable (core_test
 	processor_service.cpp
 	peer_container.cpp
 	rpc.cpp
-	signing.cpp
-	timer.cpp
 	uint256_union.cpp
 	versioning.cpp
 	wallet.cpp
@@ -27,6 +24,5 @@ add_executable (core_test
 target_compile_definitions(core_test
 		PRIVATE
 			-DFROSTBIT_VERSION_MAJOR=${CPACK_PACKAGE_VERSION_MAJOR}
-			-DFROSTBIT_VERSION_MINOR=${CPACK_PACKAGE_VERSION_MINOR}
-			-DFROSTBIT_VERSION_PATCH=${CPACK_PACKAGE_VERSION_PATCH})
+			-DFROSTBIT_VERSION_MINOR=${CPACK_PACKAGE_VERSION_MINOR})
 target_link_libraries (core_test node secure gtest_main gtest libminiupnpc-static Boost::boost)
