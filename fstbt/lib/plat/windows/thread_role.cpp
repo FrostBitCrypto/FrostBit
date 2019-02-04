@@ -16,3 +16,4 @@ void rai::thread_role::set_name (std::string thread_name)
 		SetThreadDescription_local (GetCurrentThread (), thread_name_wide.c_str ());
 	}
 }
+

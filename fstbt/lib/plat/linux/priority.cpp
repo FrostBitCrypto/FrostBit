@@ -14,3 +14,4 @@ void rai::work_thread_reprioritize ()
 		(void)result;
 	}
 }
+
