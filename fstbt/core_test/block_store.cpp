@@ -8,44 +8,17 @@
 
 TEST (block_store, construction)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto now (rai::seconds_since_epoch ());
 	ASSERT_GT (now, 1408074640);
 }
 
-TEST (block_store, sideband_serialization)
-{
-	rai::block_sideband sideband1;
-	sideband1.type = rai::block_type::receive;
-	sideband1.account = 1;
-	sideband1.balance = 2;
-	sideband1.height = 3;
-	sideband1.successor = 4;
-	sideband1.timestamp = 5;
-	std::vector<uint8_t> vector;
-	{
-		rai::vectorstream stream1 (vector);
-		sideband1.serialize (stream1);
-	}
-	rai::bufferstream stream2 (vector.data (), vector.size ());
-	rai::block_sideband sideband2;
-	sideband2.type = rai::block_type::receive;
-	ASSERT_FALSE (sideband2.deserialize (stream2));
-	ASSERT_EQ (sideband1.account, sideband2.account);
-	ASSERT_EQ (sideband1.balance, sideband2.balance);
-	ASSERT_EQ (sideband1.height, sideband2.height);
-	ASSERT_EQ (sideband1.successor, sideband2.successor);
-	ASSERT_EQ (sideband1.timestamp, sideband2.timestamp);
-}
-
 TEST (block_store, add_item)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::open_block block (0, 1, 0, rai::keypair ().prv, 0, 0);
 	rai::uint256_union hash1 (block.hash ());
@@ -53,8 +26,7 @@ TEST (block_store, add_item)
 	auto latest1 (store.block_get (transaction, hash1));
 	ASSERT_EQ (nullptr, latest1);
 	ASSERT_FALSE (store.block_exists (transaction, hash1));
-	rai::block_sideband sideband (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hash1, block, sideband);
+	store.block_put (transaction, hash1, block);
 	auto latest2 (store.block_get (transaction, hash1));
 	ASSERT_NE (nullptr, latest2);
 	ASSERT_EQ (block, *latest2);
@@ -65,34 +37,10 @@ TEST (block_store, add_item)
 	ASSERT_EQ (nullptr, latest3);
 }
 
-TEST (block_store, clear_successor)
-{
-	rai::logging logging;
-	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
-	ASSERT_TRUE (!init);
-	rai::open_block block1 (0, 1, 0, rai::keypair ().prv, 0, 0);
-	auto transaction (store.tx_begin (true));
-	rai::block_sideband sideband (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, block1.hash (), block1, sideband);
-	rai::open_block block2 (0, 2, 0, rai::keypair ().prv, 0, 0);
-	store.block_put (transaction, block2.hash (), block2, sideband);
-	ASSERT_NE (nullptr, store.block_get (transaction, block1.hash (), &sideband));
-	ASSERT_EQ (0, sideband.successor.number ());
-	sideband.successor = block2.hash ();
-	store.block_put (transaction, block1.hash (), block1, sideband);
-	ASSERT_NE (nullptr, store.block_get (transaction, block1.hash (), &sideband));
-	ASSERT_EQ (block2.hash (), sideband.successor);
-	store.block_successor_clear (transaction, block1.hash ());
-	ASSERT_NE (nullptr, store.block_get (transaction, block1.hash (), &sideband));
-	ASSERT_EQ (0, sideband.successor.number ());
-}
-
 TEST (block_store, add_nonempty_block)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key1;
 	rai::open_block block (0, 1, 0, rai::keypair ().prv, 0, 0);
@@ -101,8 +49,7 @@ TEST (block_store, add_nonempty_block)
 	auto transaction (store.tx_begin (true));
 	auto latest1 (store.block_get (transaction, hash1));
 	ASSERT_EQ (nullptr, latest1);
-	rai::block_sideband sideband (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hash1, block, sideband);
+	store.block_put (transaction, hash1, block);
 	auto latest2 (store.block_get (transaction, hash1));
 	ASSERT_NE (nullptr, latest2);
 	ASSERT_EQ (block, *latest2);
@@ -110,9 +57,8 @@ TEST (block_store, add_nonempty_block)
 
 TEST (block_store, add_two_items)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key1;
 	rai::open_block block (0, 1, 1, rai::keypair ().prv, 0, 0);
@@ -127,10 +73,8 @@ TEST (block_store, add_two_items)
 	block2.signature = rai::sign_message (key1.prv, key1.pub, hash2);
 	auto latest2 (store.block_get (transaction, hash2));
 	ASSERT_EQ (nullptr, latest2);
-	rai::block_sideband sideband (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hash1, block, sideband);
-	rai::block_sideband sideband2 (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hash2, block2, sideband2);
+	store.block_put (transaction, hash1, block);
+	store.block_put (transaction, hash2, block2);
 	auto latest3 (store.block_get (transaction, hash1));
 	ASSERT_NE (nullptr, latest3);
 	ASSERT_EQ (block, *latest3);
@@ -142,22 +86,19 @@ TEST (block_store, add_two_items)
 
 TEST (block_store, add_receive)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key1;
 	rai::keypair key2;
 	rai::open_block block1 (0, 1, 0, rai::keypair ().prv, 0, 0);
 	auto transaction (store.tx_begin (true));
-	rai::block_sideband sideband1 (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, block1.hash (), block1, sideband1);
+	store.block_put (transaction, block1.hash (), block1);
 	rai::receive_block block (block1.hash (), 1, rai::keypair ().prv, 2, 3);
 	rai::block_hash hash1 (block.hash ());
 	auto latest1 (store.block_get (transaction, hash1));
 	ASSERT_EQ (nullptr, latest1);
-	rai::block_sideband sideband (rai::block_type::receive, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hash1, block, sideband);
+	store.block_put (transaction, hash1, block);
 	auto latest2 (store.block_get (transaction, hash1));
 	ASSERT_NE (nullptr, latest2);
 	ASSERT_EQ (block, *latest2);
@@ -165,9 +106,8 @@ TEST (block_store, add_receive)
 
 TEST (block_store, add_pending)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key1;
 	rai::pending_key key2 (0, 0);
@@ -184,9 +124,8 @@ TEST (block_store, add_pending)
 
 TEST (block_store, pending_iterator)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto transaction (store.tx_begin (true));
 	ASSERT_EQ (store.pending_end (), store.pending_begin (transaction));
@@ -210,9 +149,8 @@ TEST (block_store, pending_iterator)
  */
 TEST (block_store, pending_iterator_comparison)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::stat stats;
 	auto transaction (store.tx_begin (true));
@@ -254,9 +192,8 @@ TEST (block_store, pending_iterator_comparison)
 
 TEST (block_store, genesis)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::genesis genesis;
 	auto hash (genesis.hash ());
@@ -278,9 +215,8 @@ TEST (block_store, genesis)
 
 TEST (representation, changes)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key1;
 	auto transaction (store.tx_begin (true));
@@ -293,9 +229,8 @@ TEST (representation, changes)
 
 TEST (bootstrap, simple)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto block1 (std::make_shared<rai::send_block> (0, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (store.tx_begin (true));
@@ -304,17 +239,16 @@ TEST (bootstrap, simple)
 	store.unchecked_put (transaction, block1->previous (), block1);
 	auto block3 (store.unchecked_get (transaction, block1->previous ()));
 	ASSERT_FALSE (block3.empty ());
-	ASSERT_EQ (*block1, *(block3[0].block));
-	store.unchecked_del (transaction, rai::unchecked_key (block1->previous (), block1->hash ()));
+	ASSERT_EQ (*block1, *block3[0]);
+	store.unchecked_del (transaction, block1->previous (), block1);
 	auto block4 (store.unchecked_get (transaction, block1->previous ()));
 	ASSERT_TRUE (block4.empty ());
 }
 
 TEST (unchecked, multiple)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto block1 (std::make_shared<rai::send_block> (4, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (store.tx_begin (true));
@@ -330,9 +264,8 @@ TEST (unchecked, multiple)
 
 TEST (unchecked, double_put)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto block1 (std::make_shared<rai::send_block> (4, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (store.tx_begin (true));
@@ -346,9 +279,8 @@ TEST (unchecked, double_put)
 
 TEST (unchecked, multiple_get)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto block1 (std::make_shared<rai::send_block> (4, 1, 2, rai::keypair ().prv, 4, 5));
 	auto block2 (std::make_shared<rai::send_block> (3, 1, 2, rai::keypair ().prv, 4, 5));
@@ -372,7 +304,7 @@ TEST (unchecked, multiple_get)
 	ASSERT_EQ (unchecked1_blocks.size (), 3);
 	for (auto & i : unchecked1_blocks)
 	{
-		unchecked1.push_back (i.block->hash ());
+		unchecked1.push_back (i->hash ());
 	}
 	ASSERT_TRUE (std::find (unchecked1.begin (), unchecked1.end (), block1->hash ()) != unchecked1.end ());
 	ASSERT_TRUE (std::find (unchecked1.begin (), unchecked1.end (), block2->hash ()) != unchecked1.end ());
@@ -382,25 +314,42 @@ TEST (unchecked, multiple_get)
 	ASSERT_EQ (unchecked2_blocks.size (), 2);
 	for (auto & i : unchecked2_blocks)
 	{
-		unchecked2.push_back (i.block->hash ());
+		unchecked2.push_back (i->hash ());
 	}
 	ASSERT_TRUE (std::find (unchecked2.begin (), unchecked2.end (), block1->hash ()) != unchecked2.end ());
 	ASSERT_TRUE (std::find (unchecked2.begin (), unchecked2.end (), block2->hash ()) != unchecked2.end ());
 	auto unchecked3 (store.unchecked_get (transaction, block2->previous ()));
 	ASSERT_EQ (unchecked3.size (), 1);
-	ASSERT_EQ (unchecked3[0].block->hash (), block2->hash ());
+	ASSERT_EQ (unchecked3[0]->hash (), block2->hash ());
 	auto unchecked4 (store.unchecked_get (transaction, block3->hash ()));
 	ASSERT_EQ (unchecked4.size (), 1);
-	ASSERT_EQ (unchecked4[0].block->hash (), block3->hash ());
+	ASSERT_EQ (unchecked4[0]->hash (), block3->hash ());
 	auto unchecked5 (store.unchecked_get (transaction, block2->hash ()));
 	ASSERT_EQ (unchecked5.size (), 0);
 }
 
+TEST (checksum, simple)
+{
+	bool init (false);
+	rai::mdb_store store (init, rai::unique_path ());
+	ASSERT_TRUE (!init);
+	rai::block_hash hash0 (0);
+	auto transaction (store.tx_begin (true));
+	ASSERT_TRUE (store.checksum_get (transaction, 0x100, 0x10, hash0));
+	rai::block_hash hash1 (0);
+	store.checksum_put (transaction, 0x100, 0x10, hash1);
+	rai::block_hash hash2;
+	ASSERT_FALSE (store.checksum_get (transaction, 0x100, 0x10, hash2));
+	ASSERT_EQ (hash1, hash2);
+	store.checksum_del (transaction, 0x100, 0x10);
+	rai::block_hash hash3;
+	ASSERT_TRUE (store.checksum_get (transaction, 0x100, 0x10, hash3));
+}
+
 TEST (block_store, empty_accounts)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto transaction (store.tx_begin ());
 	auto begin (store.latest_begin (transaction));
@@ -410,22 +359,19 @@ TEST (block_store, empty_accounts)
 
 TEST (block_store, one_block)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::open_block block1 (0, 1, 0, rai::keypair ().prv, 0, 0);
 	auto transaction (store.tx_begin (true));
-	rai::block_sideband sideband (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, block1.hash (), block1, sideband);
+	store.block_put (transaction, block1.hash (), block1);
 	ASSERT_TRUE (store.block_exists (transaction, block1.hash ()));
 }
 
 TEST (block_store, empty_bootstrap)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto transaction (store.tx_begin ());
 	auto begin (store.unchecked_begin (transaction));
@@ -435,9 +381,8 @@ TEST (block_store, empty_bootstrap)
 
 TEST (block_store, one_bootstrap)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto block1 (std::make_shared<rai::send_block> (0, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (store.tx_begin (true));
@@ -446,11 +391,11 @@ TEST (block_store, one_bootstrap)
 	auto begin (store.unchecked_begin (transaction));
 	auto end (store.unchecked_end ());
 	ASSERT_NE (end, begin);
-	rai::uint256_union hash1 (begin->first.key ());
+	rai::uint256_union hash1 (begin->first);
 	ASSERT_EQ (block1->hash (), hash1);
-	auto blocks (store.unchecked_get (transaction, hash1));
+	auto blocks (store.unchecked_get (transaction, rai::block_hash (begin->first)));
 	ASSERT_EQ (1, blocks.size ());
-	auto block2 (blocks[0].block);
+	auto block2 (blocks[0]);
 	ASSERT_EQ (*block1, *block2);
 	++begin;
 	ASSERT_EQ (end, begin);
@@ -458,9 +403,8 @@ TEST (block_store, one_bootstrap)
 
 TEST (block_store, unchecked_begin_search)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key0;
 	rai::send_block block1 (0, 1, 2, key0.prv, key0.pub, 3);
@@ -469,9 +413,8 @@ TEST (block_store, unchecked_begin_search)
 
 TEST (block_store, frontier_retrieval)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::account account1 (0);
 	rai::account_info info1 (0, 0, 0, 0, 0, 0, rai::epoch::epoch_0);
@@ -484,9 +427,8 @@ TEST (block_store, frontier_retrieval)
 
 TEST (block_store, one_account)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::account account (0);
 	rai::block_hash hash (0);
@@ -507,9 +449,8 @@ TEST (block_store, one_account)
 
 TEST (block_store, two_block)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::open_block block1 (0, 1, 1, rai::keypair ().prv, 0, 0);
 	block1.hashables.account = 1;
@@ -518,24 +459,20 @@ TEST (block_store, two_block)
 	hashes.push_back (block1.hash ());
 	blocks.push_back (block1);
 	auto transaction (store.tx_begin (true));
-	rai::block_sideband sideband1 (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hashes[0], block1, sideband1);
+	store.block_put (transaction, hashes[0], block1);
 	rai::open_block block2 (0, 1, 2, rai::keypair ().prv, 0, 0);
 	hashes.push_back (block2.hash ());
 	blocks.push_back (block2);
-	rai::block_sideband sideband2 (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hashes[1], block2, sideband2);
+	store.block_put (transaction, hashes[1], block2);
 	ASSERT_TRUE (store.block_exists (transaction, block1.hash ()));
 	ASSERT_TRUE (store.block_exists (transaction, block2.hash ()));
 }
 
 TEST (block_store, two_account)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
-	store.stop ();
 	rai::account account1 (1);
 	rai::block_hash hash1 (2);
 	rai::account account2 (3);
@@ -566,11 +503,9 @@ TEST (block_store, two_account)
 
 TEST (block_store, latest_find)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
-	store.stop ();
 	rai::account account1 (1);
 	rai::block_hash hash1 (2);
 	rai::account account2 (3);
@@ -591,9 +526,8 @@ TEST (block_store, latest_find)
 
 TEST (block_store, bad_path)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, boost::filesystem::path ("///"));
+	rai::mdb_store store (init, boost::filesystem::path ("///"));
 	ASSERT_TRUE (init);
 }
 
@@ -605,17 +539,15 @@ TEST (block_store, DISABLED_already_open) // File can be shared
 	std::ofstream file;
 	file.open (path.string ().c_str ());
 	ASSERT_TRUE (file.is_open ());
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_TRUE (init);
 }
 
 TEST (block_store, roots)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::send_block send_block (0, 1, 2, rai::keypair ().prv, 4, 5);
 	ASSERT_EQ (send_block.hashables.previous, send_block.root ());
@@ -629,9 +561,8 @@ TEST (block_store, roots)
 
 TEST (block_store, pending_exists)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::pending_key two (2, 0);
 	rai::pending_info pending;
@@ -643,9 +574,8 @@ TEST (block_store, pending_exists)
 
 TEST (block_store, latest_exists)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::block_hash two (2);
 	rai::account_info info;
@@ -657,9 +587,8 @@ TEST (block_store, latest_exists)
 
 TEST (block_store, large_iteration)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	std::unordered_set<rai::account> accounts1;
 	for (auto i (0); i < 1000; ++i)
@@ -685,9 +614,8 @@ TEST (block_store, large_iteration)
 
 TEST (block_store, frontier)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto transaction (store.tx_begin (true));
 	rai::block_hash hash (100);
@@ -701,17 +629,14 @@ TEST (block_store, frontier)
 
 TEST (block_store, block_replace)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::send_block send1 (0, 0, 0, rai::keypair ().prv, 0, 1);
 	rai::send_block send2 (0, 0, 0, rai::keypair ().prv, 0, 2);
 	auto transaction (store.tx_begin (true));
-	rai::block_sideband sideband1 (rai::block_type::send, 0, 0, 0, 0, 0);
-	store.block_put (transaction, 0, send1, sideband1);
-	rai::block_sideband sideband2 (rai::block_type::send, 0, 0, 0, 0, 0);
-	store.block_put (transaction, 0, send2, sideband2);
+	store.block_put (transaction, 0, send1);
+	store.block_put (transaction, 0, send2);
 	auto block3 (store.block_get (transaction, 0));
 	ASSERT_NE (nullptr, block3);
 	ASSERT_EQ (2, block3->block_work ());
@@ -719,24 +644,21 @@ TEST (block_store, block_replace)
 
 TEST (block_store, block_count)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto transaction (store.tx_begin (true));
 	ASSERT_EQ (0, store.block_count (transaction).sum ());
 	rai::open_block block (0, 1, 0, rai::keypair ().prv, 0, 0);
 	rai::uint256_union hash1 (block.hash ());
-	rai::block_sideband sideband (rai::block_type::open, 0, 0, 0, 0, 0);
-	store.block_put (transaction, hash1, block, sideband);
+	store.block_put (transaction, hash1, block);
 	ASSERT_EQ (1, store.block_count (transaction).sum ());
 }
 
 TEST (block_store, account_count)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	auto transaction (store.tx_begin (true));
 	ASSERT_EQ (0, store.account_count (transaction));
@@ -747,9 +669,8 @@ TEST (block_store, account_count)
 
 TEST (block_store, sequence_increment)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::keypair key1;
 	rai::keypair key2;
@@ -782,11 +703,9 @@ TEST (block_store, upgrade_v2_v3)
 	rai::block_hash change_hash;
 	auto path (rai::unique_path ());
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
+		rai::mdb_store store (init, path);
 		ASSERT_TRUE (!init);
-		store.stop ();
 		auto transaction (store.tx_begin (true));
 		rai::genesis genesis;
 		auto hash (genesis.hash ());
@@ -811,9 +730,8 @@ TEST (block_store, upgrade_v2_v3)
 		auto status (mdb_put (store.env.tx (transaction), store.accounts_v0, rai::mdb_val (rai::test_genesis_key.pub), info_old.val (), 0));
 		assert (status == 0);
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	rai::stat stats;
 	rai::ledger ledger (store, stats);
 	auto transaction (store.tx_begin (true));
@@ -833,20 +751,17 @@ TEST (block_store, upgrade_v3_v4)
 	rai::keypair key3;
 	auto path (rai::unique_path ());
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
+		rai::mdb_store store (init, path);
 		ASSERT_FALSE (init);
-		store.stop ();
 		auto transaction (store.tx_begin (true));
 		store.version_put (transaction, 3);
 		rai::pending_info_v3 info (key1.pub, 100, key2.pub);
 		auto status (mdb_put (store.env.tx (transaction), store.pending_v0, rai::mdb_val (key3.pub), info.val (), 0));
 		ASSERT_EQ (0, status);
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	rai::stat stats;
 	rai::ledger ledger (store, stats);
 	auto transaction (store.tx_begin (true));
@@ -867,11 +782,9 @@ TEST (block_store, upgrade_v4_v5)
 	rai::block_hash hash (0);
 	auto path (rai::unique_path ());
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
+		rai::mdb_store store (init, path);
 		ASSERT_FALSE (init);
-		store.stop ();
 		auto transaction (store.tx_begin (true));
 		rai::genesis genesis;
 		rai::stat stats;
@@ -881,7 +794,7 @@ TEST (block_store, upgrade_v4_v5)
 		rai::account_info info;
 		store.account_get (transaction, rai::test_genesis_key.pub, info);
 		rai::keypair key0;
-		rai::send_block block0 (info.head, key0.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+		rai::send_block block0 (info.head, key0.pub, rai::genesis_amount - rai::Gice_ratio, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 		ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block0).code);
 		hash = block0.hash ();
 		auto original (store.block_get (transaction, info.head));
@@ -894,9 +807,8 @@ TEST (block_store, upgrade_v4_v5)
 		auto status (mdb_put (store.env.tx (transaction), store.accounts_v0, rai::mdb_val (rai::test_genesis_key.pub), info_old.val (), 0));
 		assert (status == 0);
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin ());
 	ASSERT_EQ (hash, store.block_successor (transaction, genesis_hash));
@@ -904,9 +816,8 @@ TEST (block_store, upgrade_v4_v5)
 
 TEST (block_store, block_random)
 {
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_TRUE (!init);
 	rai::genesis genesis;
 	auto transaction (store.tx_begin (true));
@@ -920,11 +831,9 @@ TEST (block_store, upgrade_v5_v6)
 {
 	auto path (rai::unique_path ());
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
+		rai::mdb_store store (init, path);
 		ASSERT_FALSE (init);
-		store.stop ();
 		auto transaction (store.tx_begin (true));
 		rai::genesis genesis;
 		store.initialize (transaction, genesis);
@@ -935,9 +844,8 @@ TEST (block_store, upgrade_v5_v6)
 		auto status (mdb_put (store.env.tx (transaction), store.accounts_v0, rai::mdb_val (rai::test_genesis_key.pub), info_old.val (), 0));
 		assert (status == 0);
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin ());
 	rai::account_info info;
@@ -949,11 +857,9 @@ TEST (block_store, upgrade_v6_v7)
 {
 	auto path (rai::unique_path ());
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
+		rai::mdb_store store (init, path);
 		ASSERT_FALSE (init);
-		store.stop ();
 		auto transaction (store.tx_begin (true));
 		rai::genesis genesis;
 		store.initialize (transaction, genesis);
@@ -963,21 +869,19 @@ TEST (block_store, upgrade_v6_v7)
 		store.flush (transaction);
 		ASSERT_NE (store.unchecked_end (), store.unchecked_begin (transaction));
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin ());
 	ASSERT_EQ (store.unchecked_end (), store.unchecked_begin (transaction));
 }
 
 // Databases need to be dropped in order to convert to dupsort compatible
-TEST (block_store, DISABLED_change_dupsort) // Unchecked is no longer dupsort table
+TEST (block_store, change_dupsort)
 {
 	auto path (rai::unique_path ());
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	auto transaction (store.tx_begin (true));
 	ASSERT_EQ (0, mdb_drop (store.env.tx (transaction), store.unchecked, 1));
 	ASSERT_EQ (0, mdb_dbi_open (store.env.tx (transaction), "unchecked", MDB_CREATE, &store.unchecked));
@@ -1021,18 +925,15 @@ TEST (block_store, upgrade_v7_v8)
 {
 	auto path (rai::unique_path ());
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
-		store.stop ();
+		rai::mdb_store store (init, path);
 		auto transaction (store.tx_begin (true));
 		ASSERT_EQ (0, mdb_drop (store.env.tx (transaction), store.unchecked, 1));
 		ASSERT_EQ (0, mdb_dbi_open (store.env.tx (transaction), "unchecked", MDB_CREATE, &store.unchecked));
 		store.version_put (transaction, 7);
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin (true));
 	auto send1 (std::make_shared<rai::send_block> (0, 0, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0));
@@ -1052,9 +953,8 @@ TEST (block_store, upgrade_v7_v8)
 TEST (block_store, sequence_flush)
 {
 	auto path (rai::unique_path ());
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin (true));
 	rai::keypair key1;
@@ -1070,9 +970,8 @@ TEST (block_store, sequence_flush)
 TEST (block_store, sequence_flush_by_hash)
 {
 	auto path (rai::unique_path ());
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin_write ());
 	rai::keypair key1;
@@ -1094,10 +993,8 @@ TEST (block_store, upgrade_v8_v9)
 	auto path (rai::unique_path ());
 	rai::keypair key;
 	{
-		rai::logging logging;
 		bool init (false);
-		rai::mdb_store store (init, logging, path);
-		store.stop ();
+		rai::mdb_store store (init, path);
 		auto transaction (store.tx_begin (true));
 		ASSERT_EQ (0, mdb_drop (store.env.tx (transaction), store.vote, 1));
 		ASSERT_EQ (0, mdb_dbi_open (store.env.tx (transaction), "sequence", MDB_CREATE, &store.vote));
@@ -1105,9 +1002,8 @@ TEST (block_store, upgrade_v8_v9)
 		ASSERT_EQ (0, mdb_put (store.env.tx (transaction), store.vote, rai::mdb_val (key.pub), rai::mdb_val (sizeof (sequence), &sequence), 0));
 		store.version_put (transaction, 8);
 	}
-	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, path);
+	rai::mdb_store store (init, path);
 	ASSERT_FALSE (init);
 	auto transaction (store.tx_begin ());
 	ASSERT_LT (8, store.version_get (transaction));
@@ -1116,11 +1012,55 @@ TEST (block_store, upgrade_v8_v9)
 	ASSERT_EQ (10, vote->sequence);
 }
 
+TEST (block_store, upgrade_v9_v10)
+{
+	auto path (rai::unique_path ());
+	rai::block_hash hash (0);
+	{
+		bool init (false);
+		rai::mdb_store store (init, path);
+		ASSERT_FALSE (init);
+		auto transaction (store.tx_begin (true));
+		rai::genesis genesis;
+		rai::stat stats;
+		rai::ledger ledger (store, stats);
+		store.initialize (transaction, genesis);
+		store.version_put (transaction, 9);
+		rai::account_info info;
+		store.account_get (transaction, rai::test_genesis_key.pub, info);
+		rai::keypair key0;
+		rai::uint128_t balance (rai::genesis_amount);
+		hash = info.head;
+		for (auto i (1); i < 32; ++i) // Making 31 send blocks (+ 1 open = 32 total)
+		{
+			balance = balance - rai::Gice_ratio;
+			rai::send_block block0 (hash, key0.pub, balance, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
+			ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block0).code);
+			hash = block0.hash ();
+		}
+		rai::block_info block_info_auto; // Checking automatic block_info creation for block 32
+		store.block_info_get (transaction, hash, block_info_auto);
+		ASSERT_EQ (block_info_auto.account, rai::test_genesis_key.pub);
+		ASSERT_EQ (block_info_auto.balance.number (), balance);
+		ASSERT_EQ (0, mdb_drop (store.env.tx (transaction), store.blocks_info, 0)); // Cleaning blocks_info subdatabase
+		bool block_info_exists (store.block_info_exists (transaction, hash));
+		ASSERT_EQ (block_info_exists, 0); // Checking if automatic block_info is deleted
+	}
+	bool init (false);
+	rai::mdb_store store (init, path);
+	ASSERT_FALSE (init);
+	auto transaction (store.tx_begin ());
+	ASSERT_LT (9, store.version_get (transaction));
+	rai::block_info block_info;
+	store.block_info_get (transaction, hash, block_info);
+	ASSERT_EQ (block_info.account, rai::test_genesis_key.pub);
+	ASSERT_EQ (block_info.balance.number (), rai::genesis_amount - rai::Gice_ratio * 31);
+}
+
 TEST (block_store, state_block)
 {
-	rai::logging logging;
 	bool error (false);
-	rai::mdb_store store (error, logging, rai::unique_path ());
+	rai::mdb_store store (error, rai::unique_path ());
 	ASSERT_FALSE (error);
 	rai::genesis genesis;
 	auto transaction (store.tx_begin (true));
@@ -1128,8 +1068,7 @@ TEST (block_store, state_block)
 	rai::keypair key1;
 	rai::state_block block1 (1, genesis.hash (), 3, 4, 6, key1.prv, key1.pub, 7);
 	ASSERT_EQ (rai::block_type::state, block1.type ());
-	rai::block_sideband sideband1 (rai::block_type::state, 0, 0, 0, 0, 0);
-	store.block_put (transaction, block1.hash (), block1, sideband1);
+	store.block_put (transaction, block1.hash (), block1);
 	ASSERT_TRUE (store.block_exists (transaction, block1.hash ()));
 	auto block2 (store.block_get (transaction, block1.hash ()));
 	ASSERT_NE (nullptr, block2);
@@ -1142,369 +1081,4 @@ TEST (block_store, state_block)
 	auto count2 (store.block_count (transaction));
 	ASSERT_EQ (0, count2.state_v0);
 	ASSERT_EQ (0, count2.state_v1);
-}
-
-namespace
-{
-void write_legacy_sideband (rai::mdb_store & store_a, rai::transaction & transaction_a, rai::block & block_a, rai::block_hash const & successor_a, MDB_dbi db_a)
-{
-	std::vector<uint8_t> vector;
-	{
-		rai::vectorstream stream (vector);
-		block_a.serialize (stream);
-		rai::write (stream, successor_a);
-	}
-	MDB_val val{ vector.size (), vector.data () };
-	auto hash (block_a.hash ());
-	auto status2 (mdb_put (store_a.env.tx (transaction_a), db_a, rai::mdb_val (hash), &val, 0));
-	ASSERT_EQ (0, status2);
-	rai::block_sideband sideband;
-	auto block2 (store_a.block_get (transaction_a, block_a.hash (), &sideband));
-	ASSERT_NE (nullptr, block2);
-	ASSERT_EQ (std::numeric_limits<uint64_t>::max (), sideband.height);
-};
-}
-
-TEST (block_store, upgrade_sideband_genesis)
-{
-	bool error (false);
-	rai::genesis genesis;
-	auto path (rai::unique_path ());
-	{
-		rai::logging logging;
-		rai::mdb_store store (error, logging, path);
-		ASSERT_FALSE (error);
-		store.stop ();
-		auto transaction (store.tx_begin (true));
-		store.version_put (transaction, 11);
-		store.initialize (transaction, genesis);
-		rai::block_sideband sideband;
-		auto genesis_block (store.block_get (transaction, genesis.hash (), &sideband));
-		ASSERT_NE (nullptr, genesis_block);
-		ASSERT_EQ (0, sideband.height);
-		write_legacy_sideband (store, transaction, *genesis_block, 0, store.open_blocks);
-		auto genesis_block2 (store.block_get (transaction, genesis.hash (), &sideband));
-		ASSERT_NE (nullptr, genesis_block);
-		ASSERT_EQ (std::numeric_limits<uint64_t>::max (), sideband.height);
-	}
-	rai::logging logging;
-	rai::mdb_store store (error, logging, path);
-	ASSERT_FALSE (error);
-	auto done (false);
-	auto iterations (0);
-	while (!done)
-	{
-		std::this_thread::sleep_for (std::chrono::milliseconds (10));
-		auto transaction (store.tx_begin (false));
-		done = store.full_sideband (transaction);
-		ASSERT_LT (iterations, 200);
-		++iterations;
-	}
-	auto transaction (store.tx_begin_read ());
-	rai::block_sideband sideband;
-	auto genesis_block (store.block_get (transaction, genesis.hash (), &sideband));
-	ASSERT_NE (nullptr, genesis_block);
-	ASSERT_EQ (0, sideband.height);
-}
-
-TEST (block_store, upgrade_sideband_two_blocks)
-{
-	bool error (false);
-	rai::genesis genesis;
-	rai::block_hash hash2;
-	auto path (rai::unique_path ());
-	{
-		rai::logging logging;
-		rai::mdb_store store (error, logging, path);
-		ASSERT_FALSE (error);
-		store.stop ();
-		rai::stat stat;
-		rai::ledger ledger (store, stat);
-		auto transaction (store.tx_begin (true));
-		store.version_put (transaction, 11);
-		store.initialize (transaction, genesis);
-		rai::state_block block (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-		hash2 = block.hash ();
-		ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block).code);
-		write_legacy_sideband (store, transaction, *genesis.open, hash2, store.open_blocks);
-		write_legacy_sideband (store, transaction, block, 0, store.state_blocks_v0);
-	}
-	rai::logging logging;
-	rai::mdb_store store (error, logging, path);
-	ASSERT_FALSE (error);
-	auto done (false);
-	auto iterations (0);
-	while (!done)
-	{
-		std::this_thread::sleep_for (std::chrono::milliseconds (10));
-		auto transaction (store.tx_begin (false));
-		done = store.full_sideband (transaction);
-		ASSERT_LT (iterations, 200);
-		++iterations;
-	}
-	auto transaction (store.tx_begin_read ());
-	rai::block_sideband sideband;
-	auto genesis_block (store.block_get (transaction, genesis.hash (), &sideband));
-	ASSERT_NE (nullptr, genesis_block);
-	ASSERT_EQ (0, sideband.height);
-	rai::block_sideband sideband2;
-	auto block2 (store.block_get (transaction, hash2, &sideband2));
-	ASSERT_NE (nullptr, block2);
-	ASSERT_EQ (1, sideband2.height);
-}
-
-TEST (block_store, upgrade_sideband_two_accounts)
-{
-	bool error (false);
-	rai::genesis genesis;
-	rai::block_hash hash2;
-	rai::block_hash hash3;
-	rai::keypair key;
-	auto path (rai::unique_path ());
-	{
-		rai::logging logging;
-		rai::mdb_store store (error, logging, path);
-		ASSERT_FALSE (error);
-		store.stop ();
-		rai::stat stat;
-		rai::ledger ledger (store, stat);
-		auto transaction (store.tx_begin (true));
-		store.version_put (transaction, 11);
-		store.initialize (transaction, genesis);
-		rai::state_block block1 (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-		hash2 = block1.hash ();
-		ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block1).code);
-		rai::state_block block2 (key.pub, 0, rai::test_genesis_key.pub, rai::Gxrb_ratio, hash2, key.prv, key.pub, 0);
-		hash3 = block2.hash ();
-		ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block2).code);
-		write_legacy_sideband (store, transaction, *genesis.open, hash2, store.open_blocks);
-		write_legacy_sideband (store, transaction, block1, 0, store.state_blocks_v0);
-		write_legacy_sideband (store, transaction, block2, 0, store.state_blocks_v0);
-	}
-	rai::logging logging;
-	rai::mdb_store store (error, logging, path);
-	ASSERT_FALSE (error);
-	auto done (false);
-	auto iterations (0);
-	while (!done)
-	{
-		std::this_thread::sleep_for (std::chrono::milliseconds (10));
-		auto transaction (store.tx_begin (false));
-		done = store.full_sideband (transaction);
-		ASSERT_LT (iterations, 200);
-		++iterations;
-	}
-	auto transaction (store.tx_begin_read ());
-	rai::block_sideband sideband;
-	auto genesis_block (store.block_get (transaction, genesis.hash (), &sideband));
-	ASSERT_NE (nullptr, genesis_block);
-	ASSERT_EQ (0, sideband.height);
-	rai::block_sideband sideband2;
-	auto block2 (store.block_get (transaction, hash2, &sideband2));
-	ASSERT_NE (nullptr, block2);
-	ASSERT_EQ (1, sideband2.height);
-	rai::block_sideband sideband3;
-	auto block3 (store.block_get (transaction, hash3, &sideband3));
-	ASSERT_NE (nullptr, block3);
-	ASSERT_EQ (0, sideband3.height);
-}
-
-TEST (block_store, insert_after_legacy)
-{
-	rai::logging logging;
-	bool error (false);
-	rai::genesis genesis;
-	rai::mdb_store store (error, logging, rai::unique_path ());
-	ASSERT_FALSE (error);
-	store.stop ();
-	rai::stat stat;
-	rai::ledger ledger (store, stat);
-	auto transaction (store.tx_begin (true));
-	store.version_put (transaction, 11);
-	store.initialize (transaction, genesis);
-	write_legacy_sideband (store, transaction, *genesis.open, 0, store.open_blocks);
-	rai::state_block block (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block).code);
-}
-
-TEST (block_store, upgrade_sideband_rollback_old)
-{
-	rai::logging logging;
-	bool error (false);
-	rai::genesis genesis;
-	rai::mdb_store store (error, logging, rai::unique_path ());
-	ASSERT_FALSE (error);
-	store.stop ();
-	rai::stat stat;
-	rai::ledger ledger (store, stat);
-	auto transaction (store.tx_begin (true));
-	store.version_put (transaction, 11);
-	store.initialize (transaction, genesis);
-	rai::send_block block1 (genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block1).code);
-	rai::send_block block2 (block1.hash (), rai::test_genesis_key.pub, rai::genesis_amount - 2 * rai::Gxrb_ratio, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block2).code);
-	write_legacy_sideband (store, transaction, *genesis.open, block1.hash (), store.open_blocks);
-	write_legacy_sideband (store, transaction, block1, block2.hash (), store.send_blocks);
-	write_legacy_sideband (store, transaction, block2, 0, store.send_blocks);
-	ASSERT_TRUE (store.block_exists (transaction, block2.hash ()));
-	ledger.rollback (transaction, block2.hash ());
-	ASSERT_FALSE (store.block_exists (transaction, block2.hash ()));
-}
-
-// Account for an open block should be retrievable
-TEST (block_store, legacy_account_computed)
-{
-	rai::logging logging;
-	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
-	ASSERT_TRUE (!init);
-	store.stop ();
-	rai::stat stats;
-	rai::ledger ledger (store, stats);
-	rai::genesis genesis;
-	auto transaction (store.tx_begin (true));
-	store.initialize (transaction, genesis);
-	store.version_put (transaction, 11);
-	write_legacy_sideband (store, transaction, *genesis.open, 0, store.open_blocks);
-	ASSERT_EQ (rai::genesis_account, ledger.account (transaction, genesis.hash ()));
-}
-
-TEST (block_store, upgrade_sideband_epoch)
-{
-	bool error (false);
-	rai::genesis genesis;
-	rai::block_hash hash2;
-	auto path (rai::unique_path ());
-	{
-		rai::logging logging;
-		rai::mdb_store store (error, logging, path);
-		ASSERT_FALSE (error);
-		store.stop ();
-		rai::stat stat;
-		rai::ledger ledger (store, stat, 42, rai::test_genesis_key.pub);
-		auto transaction (store.tx_begin (true));
-		store.version_put (transaction, 11);
-		store.initialize (transaction, genesis);
-		rai::state_block block1 (rai::test_genesis_key.pub, genesis.hash (), rai::test_genesis_key.pub, rai::genesis_amount, 42, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-		hash2 = block1.hash ();
-		ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block1).code);
-		ASSERT_EQ (rai::epoch::epoch_1, store.block_version (transaction, hash2));
-		write_legacy_sideband (store, transaction, *genesis.open, hash2, store.open_blocks);
-		write_legacy_sideband (store, transaction, block1, 0, store.state_blocks_v1);
-	}
-	rai::logging logging;
-	rai::mdb_store store (error, logging, path);
-	rai::stat stat;
-	rai::ledger ledger (store, stat, 42, rai::test_genesis_key.pub);
-	ASSERT_FALSE (error);
-	auto done (false);
-	auto iterations (0);
-	while (!done)
-	{
-		std::this_thread::sleep_for (std::chrono::milliseconds (10));
-		auto transaction (store.tx_begin (false));
-		done = store.full_sideband (transaction);
-		ASSERT_LT (iterations, 200);
-		++iterations;
-	}
-	auto transaction (store.tx_begin_write ());
-	ASSERT_EQ (rai::epoch::epoch_1, store.block_version (transaction, hash2));
-	rai::block_sideband sideband;
-	auto block1 (store.block_get (transaction, hash2, &sideband));
-	ASSERT_NE (std::numeric_limits<uint64_t>::max (), sideband.height);
-	rai::state_block block2 (rai::test_genesis_key.pub, hash2, rai::test_genesis_key.pub, rai::genesis_amount - rai::Gxrb_ratio, rai::test_genesis_key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	ASSERT_EQ (rai::process_result::progress, ledger.process (transaction, block2).code);
-	ASSERT_EQ (rai::epoch::epoch_1, store.block_version (transaction, block2.hash ()));
-}
-
-TEST (block_store, peers)
-{
-	rai::logging logging;
-	auto init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
-	ASSERT_TRUE (!init);
-
-	auto transaction (store.tx_begin_write ());
-	rai::endpoint_key endpoint (boost::asio::ip::address_v6::any ().to_bytes (), 100);
-
-	// Confirm that the store is empty
-	ASSERT_FALSE (store.peer_exists (transaction, endpoint));
-	ASSERT_EQ (store.peer_count (transaction), 0);
-
-	// Add one, confirm that it can be found
-	store.peer_put (transaction, endpoint);
-	ASSERT_TRUE (store.peer_exists (transaction, endpoint));
-	ASSERT_EQ (store.peer_count (transaction), 1);
-
-	// Add another one and check that it (and the existing one) can be found
-	rai::endpoint_key endpoint1 (boost::asio::ip::address_v6::any ().to_bytes (), 101);
-	store.peer_put (transaction, endpoint1);
-	ASSERT_TRUE (store.peer_exists (transaction, endpoint1)); // Check new peer is here
-	ASSERT_TRUE (store.peer_exists (transaction, endpoint)); // Check first peer is still here
-	ASSERT_EQ (store.peer_count (transaction), 2);
-
-	// Delete the first one
-	store.peer_del (transaction, endpoint1);
-	ASSERT_FALSE (store.peer_exists (transaction, endpoint1)); // Confirm it no longer exists
-	ASSERT_TRUE (store.peer_exists (transaction, endpoint)); // Check first peer is still here
-	ASSERT_EQ (store.peer_count (transaction), 1);
-
-	// Delete original one
-	store.peer_del (transaction, endpoint);
-	ASSERT_EQ (store.peer_count (transaction), 0);
-	ASSERT_FALSE (store.peer_exists (transaction, endpoint));
-}
-
-TEST (block_store, endpoint_key_byte_order)
-{
-	boost::asio::ip::address_v6 address (boost::asio::ip::address_v6::from_string ("::ffff:127.0.0.1"));
-	auto port = 100;
-	rai::endpoint_key endpoint_key (address.to_bytes (), port);
-
-	std::vector<uint8_t> bytes;
-	{
-		rai::vectorstream stream (bytes);
-		rai::write (stream, endpoint_key);
-	}
-
-	// This checks that the endpoint is serialized as expected, with a size
-	// of 18 bytes (16 for ipv6 address and 2 for port), both in network byte order.
-	ASSERT_EQ (bytes.size (), 18);
-	ASSERT_EQ (bytes[10], 0xff);
-	ASSERT_EQ (bytes[11], 0xff);
-	ASSERT_EQ (bytes[12], 127);
-	ASSERT_EQ (bytes[bytes.size () - 2], 0);
-	ASSERT_EQ (bytes.back (), 100);
-
-	// Deserialize the same stream bytes
-	rai::bufferstream stream1 (bytes.data (), bytes.size ());
-	rai::endpoint_key endpoint_key1;
-	rai::read (stream1, endpoint_key1);
-
-	// This should be in network bytes order
-	ASSERT_EQ (address.to_bytes (), endpoint_key1.address_bytes ());
-
-	// This should be in host byte order
-	ASSERT_EQ (port, endpoint_key1.port ());
-}
-
-TEST (block_store, online_weight)
-{
-	rai::logging logging;
-	bool error (false);
-	rai::mdb_store store (error, logging, rai::unique_path ());
-	ASSERT_FALSE (error);
-	auto transaction (store.tx_begin (true));
-	ASSERT_EQ (0, store.online_weight_count (transaction));
-	ASSERT_EQ (store.online_weight_end (), store.online_weight_begin (transaction));
-	store.online_weight_put (transaction, 1, 2);
-	ASSERT_EQ (1, store.online_weight_count (transaction));
-	auto item (store.online_weight_begin (transaction));
-	ASSERT_NE (store.online_weight_end (), item);
-	ASSERT_EQ (1, item->first);
-	ASSERT_EQ (2, item->second.number ());
-	store.online_weight_del (transaction, 1);
-	ASSERT_EQ (0, store.online_weight_count (transaction));
-	ASSERT_EQ (store.online_weight_end (), store.online_weight_begin (transaction));
 }
