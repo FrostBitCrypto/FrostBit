@@ -115,7 +115,7 @@ public:
 	std::unordered_set<rai::block_hash> lazy_keys;
 	std::deque<rai::block_hash> lazy_pulls;
 	std::atomic<uint64_t> lazy_stopped;
-	uint64_t lazy_max_pull_blocks = (rai::rai_network == rai::rai_networks::rai_test_network) ? 2 : 512;
+	uint64_t lazy_max_pull_blocks = (rai::fstbt_network == rai::fstbt_networks::fstbt_test_network) ? 2 : 512;
 	uint64_t lazy_max_stopped = 256;
 	std::mutex lazy_mutex;
 };

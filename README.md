@@ -18,7 +18,7 @@ We've applied the philosophy of _"do one thing and do it well."_ We are focused 
 
 ### Key Features
 
-* FrostBit utilizes a novel [block-lattice](https://github.com/frostbitcrypto/raiblocks/wiki/Block-lattice) architecture, unlike conventional blockchains used in many other cryptocurrencies.
+* FrostBit utilizes a novel [block-lattice](https://github.com/frostbitcrypto/frostbit/wiki/Block-lattice) architecture, unlike conventional blockchains used in many other cryptocurrencies.
 * The network requires minimal resources, no high-power mining hardware, and can process high transaction throughput.
 * Offers instantaneous transactions with zero fees and unlimited scalability, making FrostBit an ideal solution for peer-to-peer transactions.
 * As of August 2018, the FrostBit network has processed over twelve million blocks with an unpruned ledger size of only 4.6GB.
@@ -28,12 +28,12 @@ For more information, see [FrostBit.info](https://frostbit.info/) or read the [w
 ### Guides & Documentation
 
 * [White Paper](https://frostbit.info/en/whitepaper)
-* [Build Instructions](https://github.com/frostbitcrypto/raiblocks/wiki/Build-Instructions)
-* [Command Line Interface](https://github.com/FrostBitCrypto/raiblocks/wiki/Command-line-interface)
-* [RPC Protocol](https://github.com/FrostBitCrypto/raiblocks/wiki/RPC-protocol)
-* [Wallet Design](https://github.com/FrostBitCrypto/raiblocks/wiki/Wallet-design)
-* [Block Lattice](https://github.com/FrostBitCrypto/raiblocks/wiki/Block-lattice)
-* [Design Features](https://github.com/FrostBitCrypto/raiblocks/wiki/Design-features)
+* [Build Instructions](https://github.com/frostbitcrypto/frostbit/wiki/Build-Instructions)
+* [Command Line Interface](https://github.com/FrostBitCrypto/frostbit/wiki/Command-line-interface)
+* [RPC Protocol](https://github.com/FrostBitCrypto/frostbit/wiki/RPC-protocol)
+* [Wallet Design](https://github.com/FrostBitCrypto/frostbit/wiki/Wallet-design)
+* [Block Lattice](https://github.com/FrostBitCrypto/frostbit/wiki/Block-lattice)
+* [Design Features](https://github.com/FrostBitCrypto/frostbit/wiki/Design-features)
 
 ### Links & Resources
 
@@ -43,14 +43,14 @@ For more information, see [FrostBit.info](https://frostbit.info/) or read the [w
 * [Reddit](https://reddit.com/r/FrostBitCrypto)
 * [Medium](https://medium.com/FrostBitCrypto)
 * [Twitter](https://twitter.com/FrostBitO)
-* [Forum](https://forum.raiblocks.net/)
-* [GitHub wiki](https://github.com/FrostBitCrypto/raiblocks/wiki)
+* [Forum](https://forum.frostbit.net/)
+* [GitHub wiki](https://github.com/FrostBitCrypto/frostbit/wiki)
 
 ### Want to Contribute?
 
-Please see the [contributors guide](https://github.com/FrostBitCrypto/raiblocks/wiki/Contributing).
+Please see the [contributors guide](https://github.com/FrostBitCrypto/frostbit/wiki/Contributing).
 
 ### Contact us
 
 We want to hear about any trouble, success, delight, or pain you experience when
-using FrostBit. Let us know by [filing an issue](https://github.com/FrostBitCrypto/raiblocks/issues), joining us in [reddit](https://reddit.com/r/FrostBitCrypto), or joining us in [Discord](https://chat.nano.org/).
+using FrostBit. Let us know by [filing an issue](https://github.com/FrostBitCrypto/frostbit/issues), joining us in [reddit](https://reddit.com/r/FrostBitCrypto), or joining us in [Discord](https://chat.nano.org/).

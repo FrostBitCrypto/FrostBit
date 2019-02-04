@@ -9,7 +9,7 @@ int main (int argc, char ** argv)
 	QCoreApplication::setOrganizationName ("FrostBit");
 	QCoreApplication::setOrganizationDomain ("frostbit.info");
 	QCoreApplication::setApplicationName ("FrostBit Wallet");
-	rai_qt::eventloop_processor processor;
+	fstbt_qt::eventloop_processor processor;
 	static int count (16);
 	rai::system system (24000, count);
 	std::unique_ptr<QTabWidget> client_tabs (new QTabWidget);
