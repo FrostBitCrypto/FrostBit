@@ -66,6 +66,7 @@ class rpc
 {
 public:
 	rpc (boost::asio::io_service &, rai::node &, rai::rpc_config const &);
+	virtual ~rpc () = default;
 	void start ();
 	virtual void accept ();
 	void stop ();
@@ -82,6 +83,7 @@ class rpc_connection : public std::enable_shared_from_this<rai::rpc_connection>
 {
 public:
 	rpc_connection (rai::node &, rai::rpc &);
+	virtual ~rpc_connection () = default;
 	virtual void parse_connection ();
 	virtual void read ();
 	virtual void write_result (std::string body, unsigned version);
@@ -145,6 +147,8 @@ public:
 	void block_hash ();
 	void bootstrap ();
 	void bootstrap_any ();
+	void bootstrap_lazy ();
+	void bootstrap_status ();
 	void chain (bool = false);
 	void confirmation_active ();
 	void confirmation_history ();
@@ -161,6 +165,8 @@ public:
 	void ledger ();
 	void mice_to_raw (rai::uint128_t = rai::Mice_ratio);
 	void mice_from_raw (rai::uint128_t = rai::Mice_ratio);
+	void node_id ();
+	void node_id_delete ();
 	void password_change ();
 	void password_enter ();
 	void password_valid (bool = false);

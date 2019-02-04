@@ -299,6 +299,12 @@ bool rai::uint512_union::operator== (rai::uint512_union const & other_a) const
 	return bytes == other_a.bytes;
 }
 
+rai::uint512_union::uint512_union (rai::uint256_union const & upper, rai::uint256_union const & lower)
+{
+	uint256s[0] = upper;
+	uint256s[1] = lower;
+}
+
 rai::uint512_union::uint512_union (rai::uint512_t const & number_a)
 {
 	rai::uint512_t number_l (number_a);
@@ -430,6 +436,12 @@ rai::public_key rai::pub_key (rai::private_key const & privatekey_a)
 bool rai::validate_message (rai::public_key const & public_key, rai::uint256_union const & message, rai::uint512_union const & signature)
 {
 	auto result (0 != ed25519_sign_open (message.bytes.data (), sizeof (message.bytes), public_key.bytes.data (), signature.bytes.data ()));
+	return result;
+}
+
+bool rai::validate_message_batch (const unsigned char ** m, size_t * mlen, const unsigned char ** pk, const unsigned char ** RS, size_t num, int * valid)
+{
+	bool result (0 == ed25519_sign_open_batch (m, mlen, pk, RS, num, valid));
 	return result;
 }
 

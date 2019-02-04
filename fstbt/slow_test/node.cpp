@@ -77,7 +77,7 @@ TEST (ledger, deep_account_compute)
 {
 	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_FALSE (init);
 	rai::stat stats;
 	rai::ledger ledger (store, stats);
@@ -296,6 +296,7 @@ TEST (broadcast, world_broadcast_simulate)
 	}
 	auto count (heard_count (nodes));
 	(void)count;
+	printf ("");
 }
 
 TEST (broadcast, sqrt_broadcast_simulate)
@@ -349,6 +350,7 @@ TEST (broadcast, sqrt_broadcast_simulate)
 	}
 	auto count (heard_count (nodes));
 	(void)count;
+	printf ("");
 }
 
 TEST (peer_container, random_set)
@@ -404,22 +406,6 @@ TEST (store, vote_load)
 	}
 }
 
-TEST (wallets, rep_scan)
-{
-	rai::system system (24000, 1);
-	auto & node (*system.nodes[0]);
-	auto wallet (system.wallet (0));
-	auto transaction (node.wallets.tx_begin_write ());
-	for (auto i (0); i < 10000; ++i)
-	{
-		wallet->deterministic_insert (transaction);
-	}
-	auto begin (std::chrono::steady_clock::now ());
-	node.wallets.foreach_representative (transaction, [](rai::public_key const & pub_a, rai::raw_key const & prv_a) {
-	});
-	ASSERT_LT (std::chrono::steady_clock::now () - begin, std::chrono::milliseconds (5));
-}
-
 TEST (node, mass_vote_by_hash)
 {
 	rai::system system (24000, 1);
@@ -430,12 +416,12 @@ TEST (node, mass_vote_by_hash)
 	std::vector<std::shared_ptr<rai::state_block>> blocks;
 	for (auto i (0); i < 10000; ++i)
 	{
-		auto block (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, previous, rai::test_genesis_key.pub, rai::genesis_amount - (i + 1) * rai::Gxrb_ratio, key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (previous)));
+		auto block (std::make_shared<rai::state_block> (rai::test_genesis_key.pub, previous, rai::test_genesis_key.pub, rai::genesis_amount - (i + 1) * rai::Gice_ratio, key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (previous)));
 		previous = block->hash ();
 		blocks.push_back (block);
 	}
 	for (auto i (blocks.begin ()), n (blocks.end ()); i != n; ++i)
 	{
-		system.nodes[0]->block_processor.add (*i, rai::seconds_since_epoch ());
+		system.nodes[0]->block_processor.add (*i, std::chrono::steady_clock::now ());
 	}
 }

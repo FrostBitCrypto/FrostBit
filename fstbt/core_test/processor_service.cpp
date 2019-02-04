@@ -10,7 +10,7 @@ TEST (processor_service, bad_send_signature)
 {
 	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_FALSE (init);
 	rai::stat stats;
 	rai::ledger ledger (store, stats);
@@ -29,7 +29,7 @@ TEST (processor_service, bad_receive_signature)
 {
 	rai::logging logging;
 	bool init (false);
-	rai::mdb_store store (init, logging, rai::unique_path ());
+	rai::mdb_store store (init, rai::unique_path ());
 	ASSERT_FALSE (init);
 	rai::stat stats;
 	rai::ledger ledger (store, stats);
@@ -62,8 +62,8 @@ TEST (alarm, one)
 		}
 		condition.notify_one ();
 	});
-	boost::asio::io_context::work work (io_ctx);
-	boost::thread thread ([&io_ctx]() { io_ctx.run (); });
+	boost::asio::io_service::work work (service);
+	boost::thread thread ([&service]() { service.run (); });
 	std::unique_lock<std::mutex> unique (mutex);
 	condition.wait (unique, [&]() { return !!done; });
 	io_ctx.stop ();
@@ -87,11 +87,11 @@ TEST (alarm, many)
 			condition.notify_one ();
 		});
 	}
-	boost::asio::io_context::work work (io_ctx);
+	boost::asio::io_service::work work (service);
 	std::vector<boost::thread> threads;
 	for (auto i (0); i < 50; ++i)
 	{
-		threads.push_back (boost::thread ([&io_ctx]() { io_ctx.run (); }));
+		threads.push_back (boost::thread ([&service]() { service.run (); }));
 	}
 	std::unique_lock<std::mutex> unique (mutex);
 	condition.wait (unique, [&]() { return count == 50; });
@@ -120,9 +120,9 @@ TEST (alarm, top_execution)
 		value2 = 2;
 		promise.set_value (false);
 	});
-	boost::asio::io_context::work work (io_ctx);
-	boost::thread thread ([&io_ctx]() {
-		io_ctx.run ();
+	boost::asio::io_service::work work (service);
+	boost::thread thread ([&service]() {
+		service.run ();
 	});
 	promise.get_future ().get ();
 	std::lock_guard<std::mutex> lock (mutex);

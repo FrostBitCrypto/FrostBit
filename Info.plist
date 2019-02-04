@@ -16,5 +16,7 @@
 	<string>FrostBit.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>net.frostbit.fstbt_wallet</string>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<true/>
 </dict>
 </plist>

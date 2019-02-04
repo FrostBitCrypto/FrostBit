@@ -10,7 +10,7 @@ TEST (gap_cache, add_new)
 	rai::gap_cache cache (*system.nodes[0]);
 	auto block1 (std::make_shared<rai::send_block> (0, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (system.nodes[0]->store.tx_begin (true));
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 }
 
 TEST (gap_cache, add_existing)
@@ -19,7 +19,7 @@ TEST (gap_cache, add_existing)
 	rai::gap_cache cache (*system.nodes[0]);
 	auto block1 (std::make_shared<rai::send_block> (0, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (system.nodes[0]->store.tx_begin (true));
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 	auto existing1 (cache.blocks.get<1> ().find (block1->hash ()));
 	ASSERT_NE (cache.blocks.get<1> ().end (), existing1);
 	auto arrival (existing1->arrival);
@@ -38,7 +38,7 @@ TEST (gap_cache, comparison)
 	rai::gap_cache cache (*system.nodes[0]);
 	auto block1 (std::make_shared<rai::send_block> (1, 0, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (system.nodes[0]->store.tx_begin (true));
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 	auto existing1 (cache.blocks.get<1> ().find (block1->hash ()));
 	ASSERT_NE (cache.blocks.get<1> ().end (), existing1);
 	auto arrival (existing1->arrival);
@@ -61,7 +61,7 @@ TEST (gap_cache, gap_bootstrap)
 	auto send (std::make_shared<rai::send_block> (latest, key.pub, rai::genesis_amount - 100, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (latest)));
 	{
 		auto transaction (system.nodes[0]->store.tx_begin (true));
-		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->block_processor.process_one (transaction, send).code);
+		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->block_processor.process_receive_one (transaction, send).code);
 	}
 	ASSERT_EQ (rai::genesis_amount - 100, system.nodes[0]->balance (rai::genesis_account));
 	ASSERT_EQ (rai::genesis_amount, system.nodes[1]->balance (rai::genesis_account));

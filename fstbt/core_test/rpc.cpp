@@ -84,7 +84,7 @@ TEST (rpc, account_balance)
 	boost::property_tree::ptree request;
 	request.put ("action", "account_balance");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -105,7 +105,7 @@ TEST (rpc, account_block_count)
 	boost::property_tree::ptree request;
 	request.put ("action", "account_block_count");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -124,9 +124,9 @@ TEST (rpc, account_create)
 	boost::property_tree::ptree request;
 	request.put ("action", "account_create");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
-	test_response response0 (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
-	while (response0.status == 0)
+	while (response.status == 0)
 	{
 		ASSERT_NO_ERROR (system.poll ());
 	}
@@ -172,7 +172,7 @@ TEST (rpc, account_weight)
 	boost::property_tree::ptree request;
 	request.put ("action", "account_weight");
 	request.put ("account", key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -195,7 +195,7 @@ TEST (rpc, wallet_contains)
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_contains");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -217,7 +217,7 @@ TEST (rpc, wallet_doesnt_contain)
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_contains");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -237,7 +237,7 @@ TEST (rpc, validate_account_number)
 	boost::property_tree::ptree request;
 	request.put ("action", "validate_account_number");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -259,7 +259,7 @@ TEST (rpc, validate_account_invalid)
 	boost::property_tree::ptree request;
 	request.put ("action", "validate_account_number");
 	request.put ("account", account);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -291,7 +291,7 @@ TEST (rpc, send)
 			ASSERT_NO_ERROR (system.poll ());
 		}
 	});
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -327,7 +327,7 @@ TEST (rpc, send_fail)
 			ASSERT_NO_ERROR (system.poll ());
 		}
 	});
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -391,7 +391,7 @@ TEST (rpc, send_idempotent)
 	request.put ("destination", rai::account (0).to_account ());
 	request.put ("amount", (rai::genesis_amount - (rai::genesis_amount / 4)).convert_to<std::string> ());
 	request.put ("id", "123abc");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -403,7 +403,7 @@ TEST (rpc, send_idempotent)
 	ASSERT_FALSE (block.decode_hex (block_text));
 	ASSERT_TRUE (system.nodes[0]->ledger.block_exists (block));
 	ASSERT_EQ (system.nodes[0]->balance (rai::test_genesis_key.pub), rai::genesis_amount / 4);
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -415,7 +415,7 @@ TEST (rpc, send_idempotent)
 	ASSERT_EQ (system.nodes[0]->balance (rai::test_genesis_key.pub), rai::genesis_amount / 4);
 	request.erase ("id");
 	request.put ("id", "456def");
-	test_response response3 (request, rpc, system.io_ctx);
+	test_response response3 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response3.status == 0)
 	{
@@ -432,7 +432,7 @@ TEST (rpc, stop)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "stop");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -455,7 +455,7 @@ TEST (rpc, wallet_add)
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_add");
 	request.put ("key", key_text);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -477,7 +477,7 @@ TEST (rpc, wallet_password_valid)
 	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
 	request.put ("wallet", wallet);
 	request.put ("action", "password_valid");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -499,7 +499,7 @@ TEST (rpc, wallet_password_change)
 	request.put ("wallet", wallet);
 	request.put ("action", "password_change");
 	request.put ("password", "test");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -535,7 +535,7 @@ TEST (rpc, wallet_password_enter)
 	request.put ("wallet", wallet);
 	request.put ("action", "password_enter");
 	request.put ("password", "");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -556,7 +556,7 @@ TEST (rpc, wallet_representative)
 	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_representative");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -579,7 +579,7 @@ TEST (rpc, wallet_representative_set)
 	rai::keypair key;
 	request.put ("action", "wallet_representative_set");
 	request.put ("representative", key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -643,7 +643,7 @@ TEST (rpc, account_list)
 	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
 	request.put ("wallet", wallet);
 	request.put ("action", "account_list");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -677,7 +677,7 @@ TEST (rpc, wallet_key_valid)
 	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_key_valid");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -695,7 +695,7 @@ TEST (rpc, wallet_create)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "wallet_create");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -749,7 +749,7 @@ TEST (rpc, wallet_export)
 	boost::property_tree::ptree request;
 	request.put ("action", "wallet_export");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -775,7 +775,7 @@ TEST (rpc, wallet_destroy)
 	boost::property_tree::ptree request;
 	request.put ("action", "wallet_destroy");
 	request.put ("wallet", wallet_id.to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -806,7 +806,7 @@ TEST (rpc, account_move)
 	entry.put ("", key.pub.to_account ());
 	keys.push_back (std::make_pair ("", entry));
 	request.add_child ("accounts", keys);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -828,7 +828,7 @@ TEST (rpc, block)
 	boost::property_tree::ptree request;
 	request.put ("action", "block");
 	request.put ("hash", system.nodes[0]->latest (rai::genesis_account).to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -848,7 +848,7 @@ TEST (rpc, block_account)
 	boost::property_tree::ptree request;
 	request.put ("action", "block_account");
 	request.put ("hash", genesis.hash ().to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -875,7 +875,7 @@ TEST (rpc, chain)
 	request.put ("action", "chain");
 	request.put ("block", block->hash ().to_string ());
 	request.put ("count", std::to_string (std::numeric_limits<uint64_t>::max ()));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -908,7 +908,7 @@ TEST (rpc, chain_limit)
 	request.put ("action", "chain");
 	request.put ("block", block->hash ().to_string ());
 	request.put ("count", 1);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -963,7 +963,7 @@ TEST (rpc, frontier)
 	rai::system system (24000, 1);
 	std::unordered_map<rai::account, rai::block_hash> source;
 	{
-		auto transaction (system.nodes[0]->store.tx_begin (true));
+		auto transaction (system.nodes[0]->wallets.tx_begin (true));
 		for (auto i (0); i < 1000; ++i)
 		{
 			rai::keypair key;
@@ -978,7 +978,7 @@ TEST (rpc, frontier)
 	request.put ("action", "frontiers");
 	request.put ("account", rai::account (0).to_account ());
 	request.put ("count", std::to_string (std::numeric_limits<uint64_t>::max ()));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1004,7 +1004,7 @@ TEST (rpc, frontier_limited)
 	rai::system system (24000, 1);
 	std::unordered_map<rai::account, rai::block_hash> source;
 	{
-		auto transaction (system.nodes[0]->store.tx_begin (true));
+		auto transaction (system.nodes[0]->wallets.tx_begin (true));
 		for (auto i (0); i < 1000; ++i)
 		{
 			rai::keypair key;
@@ -1019,7 +1019,7 @@ TEST (rpc, frontier_limited)
 	request.put ("action", "frontiers");
 	request.put ("account", rai::account (0).to_account ());
 	request.put ("count", std::to_string (100));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1035,7 +1035,7 @@ TEST (rpc, frontier_startpoint)
 	rai::system system (24000, 1);
 	std::unordered_map<rai::account, rai::block_hash> source;
 	{
-		auto transaction (system.nodes[0]->store.tx_begin (true));
+		auto transaction (system.nodes[0]->wallets.tx_begin (true));
 		for (auto i (0); i < 1000; ++i)
 		{
 			rai::keypair key;
@@ -1050,7 +1050,7 @@ TEST (rpc, frontier_startpoint)
 	request.put ("action", "frontiers");
 	request.put ("account", source.begin ()->first.to_account ());
 	request.put ("count", std::to_string (1));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1078,7 +1078,7 @@ TEST (rpc, history)
 	rai::state_block ureceive (rai::genesis_account, usend.hash (), rai::genesis_account, rai::genesis_amount, usend.hash (), rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	rai::state_block uchange (rai::genesis_account, ureceive.hash (), rai::keypair ().pub, rai::genesis_amount, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	{
-		auto transaction (node0->store.tx_begin (true));
+		auto transaction (node0->wallets.tx_begin (true));
 		ASSERT_EQ (rai::process_result::progress, node0->ledger.process (transaction, usend).code);
 		ASSERT_EQ (rai::process_result::progress, node0->ledger.process (transaction, ureceive).code);
 		ASSERT_EQ (rai::process_result::progress, node0->ledger.process (transaction, uchange).code);
@@ -1089,7 +1089,7 @@ TEST (rpc, history)
 	request.put ("action", "history");
 	request.put ("hash", uchange.hash ().to_string ());
 	request.put ("count", 100);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1142,7 +1142,7 @@ TEST (rpc, history_count)
 	request.put ("action", "history");
 	request.put ("hash", receive->hash ().to_string ());
 	request.put ("count", 1);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1167,7 +1167,7 @@ TEST (rpc, process_block)
 	std::string json;
 	send.serialize_json (json);
 	request.put ("block", json);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1198,7 +1198,7 @@ TEST (rpc, process_block_no_work)
 	std::string json;
 	send.serialize_json (json);
 	request.put ("block", json);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1222,7 +1222,7 @@ TEST (rpc, process_republish)
 	std::string json;
 	send.serialize_json (json);
 	request.put ("block", json);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1243,7 +1243,7 @@ TEST (rpc, keepalive)
 	auto node1 (std::make_shared<rai::node> (init1, system.io_ctx, 24001, rai::unique_path (), system.alarm, system.logging, system.work));
 	node1->start ();
 	system.nodes.push_back (node1);
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "keepalive");
@@ -1253,7 +1253,7 @@ TEST (rpc, keepalive)
 	request.put ("port", port);
 	ASSERT_FALSE (system.nodes[0]->peers.known_peer (node1->network.endpoint ()));
 	ASSERT_EQ (0, system.nodes[0]->peers.size ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1282,7 +1282,7 @@ TEST (rpc, payment_init)
 	boost::property_tree::ptree request;
 	request.put ("action", "payment_init");
 	request.put ("wallet", wallet_id.pub.to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1305,7 +1305,7 @@ TEST (rpc, payment_begin_end)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "payment_begin");
 	request1.put ("wallet", wallet_id.pub.to_string ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1340,7 +1340,7 @@ TEST (rpc, payment_begin_end)
 	request2.put ("action", "payment_end");
 	request2.put ("wallet", wallet_id.pub.to_string ());
 	request2.put ("account", account.to_account ());
-	test_response response2 (request2, rpc, system.io_ctx);
+	test_response response2 (request2, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -1359,7 +1359,7 @@ TEST (rpc, payment_end_nonempty)
 	rai::node_init init1;
 	auto node1 (system.nodes[0]);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto transaction (node1->wallets.tx_begin ());
+	auto transaction (node1->store.tx_begin ());
 	system.wallet (0)->init_free_accounts (transaction);
 	auto wallet_id (node1->wallets.items.begin ()->first);
 	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
@@ -1368,7 +1368,7 @@ TEST (rpc, payment_end_nonempty)
 	request1.put ("action", "payment_end");
 	request1.put ("wallet", wallet_id.to_string ());
 	request1.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1384,7 +1384,7 @@ TEST (rpc, payment_zero_balance)
 	rai::node_init init1;
 	auto node1 (system.nodes[0]);
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto transaction (node1->wallets.tx_begin ());
+	auto transaction (node1->store.tx_begin ());
 	system.wallet (0)->init_free_accounts (transaction);
 	auto wallet_id (node1->wallets.items.begin ()->first);
 	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
@@ -1392,7 +1392,7 @@ TEST (rpc, payment_zero_balance)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "payment_begin");
 	request1.put ("wallet", wallet_id.to_string ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1418,7 +1418,7 @@ TEST (rpc, payment_begin_reuse)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "payment_begin");
 	request1.put ("wallet", wallet_id.pub.to_string ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1434,7 +1434,7 @@ TEST (rpc, payment_begin_reuse)
 	request2.put ("action", "payment_end");
 	request2.put ("wallet", wallet_id.pub.to_string ());
 	request2.put ("account", account.to_account ());
-	test_response response2 (request2, rpc, system.io_ctx);
+	test_response response2 (request2, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -1443,7 +1443,7 @@ TEST (rpc, payment_begin_reuse)
 	ASSERT_EQ (200, response2.status);
 	ASSERT_TRUE (wallet->exists (account));
 	ASSERT_NE (wallet->free_accounts.end (), wallet->free_accounts.find (account));
-	test_response response3 (request1, rpc, system.io_ctx);
+	test_response response3 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response3.status == 0)
 	{
@@ -1474,7 +1474,7 @@ TEST (rpc, payment_begin_locked)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "payment_begin");
 	request1.put ("wallet", wallet_id.pub.to_string ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1499,7 +1499,7 @@ TEST (rpc, payment_wait)
 	request1.put ("account", key.pub.to_account ());
 	request1.put ("amount", rai::amount (rai::Mice_ratio).to_string_dec ());
 	request1.put ("timeout", "100");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1520,7 +1520,7 @@ TEST (rpc, payment_wait)
 	ASSERT_EQ (200, response2.status);
 	ASSERT_EQ ("success", response2.json.get<std::string> ("status"));
 	request1.put ("amount", rai::amount (rai::Mice_ratio * 2).to_string_dec ());
-	test_response response3 (request1, rpc, system.io_ctx);
+	test_response response3 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response3.status == 0)
 	{
@@ -1539,7 +1539,7 @@ TEST (rpc, peers)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "peers");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1595,13 +1595,13 @@ TEST (rpc, pending)
 	{
 		ASSERT_NO_ERROR (system.poll ());
 	}
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "pending");
 	request.put ("account", key1.pub.to_account ());
 	request.put ("count", "100");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1613,7 +1613,7 @@ TEST (rpc, pending)
 	rai::block_hash hash1 (blocks_node.begin ()->second.get<std::string> (""));
 	ASSERT_EQ (block1->hash (), hash1);
 	request.put ("threshold", "100"); // Threshold test
-	test_response response0 (request, rpc, system.io_ctx);
+	test_response response0 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response0.status == 0)
 	{
@@ -1648,7 +1648,7 @@ TEST (rpc, pending)
 	request.put ("threshold", "0");
 	request.put ("source", "true");
 	request.put ("min_version", "true");
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -1703,12 +1703,12 @@ TEST (rpc, search_pending)
 	rai::send_block block (system.nodes[0]->latest (rai::test_genesis_key.pub), rai::test_genesis_key.pub, rai::genesis_amount - system.nodes[0]->config.receive_minimum.number (), rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	auto transaction (system.nodes[0]->store.tx_begin (true));
 	ASSERT_EQ (rai::process_result::progress, system.nodes[0]->ledger.process (transaction, block).code);
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "search_pending");
 	request.put ("wallet", wallet);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -1734,7 +1734,7 @@ TEST (rpc, version)
 	rpc.start ();
 	boost::property_tree::ptree request1;
 	request1.put ("action", "version");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1748,14 +1748,7 @@ TEST (rpc, version)
 		ASSERT_EQ (std::to_string (node1->store.version_get (transaction)), response1.json.get<std::string> ("store_version"));
 	}
 	ASSERT_EQ (std::to_string (rai::protocol_version), response1.json.get<std::string> ("protocol_version"));
-	if (FROSTBIT_VERSION_PATCH == 0)
-	{
-		ASSERT_EQ (boost::str (boost::format ("Frostbit %1%") % FROSTBIT_MAJOR_MINOR_VERSION), response1.json.get<std::string> ("node_vendor"));
-	}
-	else
-	{
-		ASSERT_EQ (boost::str (boost::format ("Frostbit %1%") % FROSTBIT_MAJOR_MINOR_RC_VERSION), response1.json.get<std::string> ("node_vendor"));
-	}
+	ASSERT_EQ (boost::str (boost::format ("FrostBit %1%.%2%") % FROSTBIT_VERSION_MAJOR % FROSTBIT_VERSION_MINOR), response1.json.get<std::string> ("node_vendor"));
 	auto headers (response1.resp.base ());
 	auto allow (headers.at ("Allow"));
 	auto content_type (headers.at ("Content-Type"));
@@ -1785,7 +1778,7 @@ TEST (rpc, work_generate)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "work_generate");
 	request1.put ("hash", hash1.to_string ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1931,7 +1924,7 @@ TEST (rpc, block_count)
 	rpc.start ();
 	boost::property_tree::ptree request1;
 	request1.put ("action", "block_count");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1951,7 +1944,7 @@ TEST (rpc, frontier_count)
 	rpc.start ();
 	boost::property_tree::ptree request1;
 	request1.put ("action", "frontier_count");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1970,7 +1963,7 @@ TEST (rpc, account_count)
 	rpc.start ();
 	boost::property_tree::ptree request1;
 	request1.put ("action", "account_count");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -1989,7 +1982,7 @@ TEST (rpc, available_supply)
 	rpc.start ();
 	boost::property_tree::ptree request1;
 	request1.put ("action", "available_supply");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2000,7 +1993,7 @@ TEST (rpc, available_supply)
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	rai::keypair key;
 	auto block (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, 1));
-	test_response response2 (request1, rpc, system.io_ctx);
+	test_response response2 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -2009,7 +2002,7 @@ TEST (rpc, available_supply)
 	ASSERT_EQ (200, response2.status);
 	ASSERT_EQ ("1", response2.json.get<std::string> ("available"));
 	auto block2 (system.wallet (0)->send_action (rai::test_genesis_key.pub, 0, 100)); // Sending to burning 0 account
-	test_response response3 (request1, rpc, system.io_ctx);
+	test_response response3 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response3.status == 0)
 	{
@@ -2029,7 +2022,7 @@ TEST (rpc, kice_to_raw)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "kice_to_raw");
 	request1.put ("amount", "1");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2047,9 +2040,9 @@ TEST (rpc, kice_from_raw)
 	rai::rpc rpc (system.io_ctx, node1, rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request1;
-	request1.put ("action", "kice_from_raw");
+	request1.put ("action", "mice_from_raw");
 	request1.put ("amount", rai::Mice_ratio.convert_to<std::string> ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2069,7 +2062,7 @@ TEST (rpc, kice_to_raw)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "kice_to_raw");
 	request1.put ("amount", "1");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2089,7 +2082,7 @@ TEST (rpc, kice_from_raw)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "kice_from_raw");
 	request1.put ("amount", rai::kice_ratio.convert_to<std::string> ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2109,7 +2102,7 @@ TEST (rpc, ice_to_raw)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "ice_to_raw");
 	request1.put ("amount", "1");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2129,7 +2122,7 @@ TEST (rpc, ice_from_raw)
 	boost::property_tree::ptree request1;
 	request1.put ("action", "ice_from_raw");
 	request1.put ("amount", rai::ice_ratio.convert_to<std::string> ());
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2148,7 +2141,7 @@ TEST (rpc, account_representative)
 	std::string wallet;
 	request.put ("account", rai::genesis_account.to_account ());
 	request.put ("action", "account_representative");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2171,7 +2164,7 @@ TEST (rpc, account_representative_set)
 	request.put ("representative", rep.pub.to_account ());
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 	request.put ("action", "account_representative_set");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2265,7 +2258,7 @@ TEST (rpc, wallet_change_seed)
 	rai::system system0 (24000, 1);
 	rai::keypair seed;
 	{
-		auto transaction (system0.nodes[0]->wallets.tx_begin ());
+		auto transaction (system0.nodes[0]->store.tx_begin ());
 		rai::raw_key seed0;
 		system0.wallet (0)->store.seed (seed0, transaction);
 		ASSERT_NE (seed.pub, seed0.data);
@@ -2284,7 +2277,7 @@ TEST (rpc, wallet_change_seed)
 	}
 	ASSERT_EQ (200, response.status);
 	{
-		auto transaction (system0.nodes[0]->wallets.tx_begin ());
+		auto transaction (system0.nodes[0]->store.tx_begin ());
 		rai::raw_key seed0;
 		system0.wallet (0)->store.seed (seed0, transaction);
 		ASSERT_EQ (seed.pub, seed0.data);
@@ -2332,7 +2325,7 @@ TEST (rpc, work_validate)
 	request.put ("action", "work_validate");
 	request.put ("hash", hash.to_string ());
 	request.put ("work", rai::to_string_hex (work1));
-	test_response response1 (request, rpc, system.io_ctx);
+	test_response response1 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2343,7 +2336,7 @@ TEST (rpc, work_validate)
 	ASSERT_EQ ("1", validate_text1);
 	uint64_t work2 (0);
 	request.put ("work", rai::to_string_hex (work2));
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -2369,7 +2362,7 @@ TEST (rpc, successors)
 	request.put ("action", "successors");
 	request.put ("block", genesis.to_string ());
 	request.put ("count", std::to_string (std::numeric_limits<uint64_t>::max ()));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2436,7 +2429,7 @@ TEST (rpc, republish)
 	boost::property_tree::ptree request;
 	request.put ("action", "republish");
 	request.put ("hash", send.hash ().to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2459,7 +2452,7 @@ TEST (rpc, republish)
 
 	request.put ("hash", genesis.hash ().to_string ());
 	request.put ("count", 1);
-	test_response response1 (request, rpc, system.io_ctx);
+	test_response response1 (request, rpc, system.service);
 	system.deadline_set (5s);
 	system.deadline_set (5s);
 	while (response1.status == 0)
@@ -2501,7 +2494,7 @@ TEST (rpc, deterministic_key)
 	rai::system system0 (24000, 1);
 	rai::raw_key seed;
 	{
-		auto transaction (system0.nodes[0]->wallets.tx_begin ());
+		auto transaction (system0.nodes[0]->store.tx_begin ());
 		system0.wallet (0)->store.seed (seed, transaction);
 	}
 	rai::account account0 (system0.wallet (0)->deterministic_insert ());
@@ -2545,7 +2538,7 @@ TEST (rpc, accounts_balances)
 	entry.put ("", rai::test_genesis_key.pub.to_account ());
 	peers_l.push_back (std::make_pair ("", entry));
 	request.add_child ("accounts", peers_l);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2576,7 +2569,7 @@ TEST (rpc, accounts_frontiers)
 	entry.put ("", rai::test_genesis_key.pub.to_account ());
 	peers_l.push_back (std::make_pair ("", entry));
 	request.add_child ("accounts", peers_l);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2598,6 +2591,7 @@ TEST (rpc, accounts_pending)
 	rai::keypair key1;
 	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
 	auto block1 (system.wallet (0)->send_action (rai::test_genesis_key.pub, key1.pub, 100));
+	auto iterations (0);
 	system.deadline_set (5s);
 	while (system.nodes[0]->active.active (*block1))
 	{
@@ -2613,7 +2607,7 @@ TEST (rpc, accounts_pending)
 	peers_l.push_back (std::make_pair ("", entry));
 	request.add_child ("accounts", peers_l);
 	request.put ("count", "100");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2628,7 +2622,7 @@ TEST (rpc, accounts_pending)
 		ASSERT_EQ (block1->hash (), hash1);
 	}
 	request.put ("threshold", "100"); // Threshold test
-	test_response response1 (request, rpc, system.io_ctx);
+	test_response response1 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2653,7 +2647,7 @@ TEST (rpc, accounts_pending)
 	}
 	ASSERT_EQ (blocks[block1->hash ()], 100);
 	request.put ("source", "true");
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -2690,7 +2684,7 @@ TEST (rpc, blocks)
 	entry.put ("", system.nodes[0]->latest (rai::genesis_account).to_string ());
 	peers_l.push_back (std::make_pair ("", entry));
 	request.add_child ("hashes", peers_l);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2715,7 +2709,7 @@ TEST (rpc, wallet_info)
 	auto send (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, 1));
 	rai::account account (system.wallet (0)->deterministic_insert ());
 	{
-		auto transaction (system.nodes[0]->wallets.tx_begin (true));
+		auto transaction (system.nodes[0]->store.tx_begin (true));
 		system.wallet (0)->store.erase (transaction, account);
 	}
 	account = system.wallet (0)->deterministic_insert ();
@@ -2724,7 +2718,7 @@ TEST (rpc, wallet_info)
 	boost::property_tree::ptree request;
 	request.put ("action", "wallet_info");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2802,12 +2796,12 @@ TEST (rpc, pending_exists)
 	{
 		ASSERT_NO_ERROR (system.poll ());
 	}
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "pending_exists");
 	request.put ("hash", hash0.to_string ());
-	test_response response0 (request, rpc, system.io_ctx);
+	test_response response0 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response0.status == 0)
 	{
@@ -2817,7 +2811,7 @@ TEST (rpc, pending_exists)
 	std::string exists_text (response0.json.get<std::string> ("exists"));
 	ASSERT_EQ ("0", exists_text);
 	request.put ("hash", block1->hash ().to_string ());
-	test_response response1 (request, rpc, system.io_ctx);
+	test_response response1 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -2934,7 +2928,7 @@ TEST (rpc, receive_minimum)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "receive_minimum");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2954,7 +2948,7 @@ TEST (rpc, receive_minimum_set)
 	request.put ("action", "receive_minimum_set");
 	request.put ("amount", "100");
 	ASSERT_NE (system.nodes[0]->config.receive_minimum.to_string_dec (), "100");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2977,7 +2971,7 @@ TEST (rpc, work_get)
 	request.put ("action", "work_get");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -2986,7 +2980,7 @@ TEST (rpc, work_get)
 	ASSERT_EQ (200, response.status);
 	std::string work_text (response.json.get<std::string> ("work"));
 	uint64_t work (1);
-	auto transaction (system.nodes[0]->wallets.tx_begin ());
+	auto transaction (system.nodes[0]->store.tx_begin ());
 	system.nodes[0]->wallets.items.begin ()->second->store.work_get (transaction, rai::genesis_account, work);
 	ASSERT_EQ (rai::to_string_hex (work), work_text);
 }
@@ -3001,14 +2995,14 @@ TEST (rpc, wallet_work_get)
 	boost::property_tree::ptree request;
 	request.put ("action", "wallet_work_get");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
 		ASSERT_NO_ERROR (system.poll ());
 	}
 	ASSERT_EQ (200, response.status);
-	auto transaction (system.nodes[0]->wallets.tx_begin ());
+	auto transaction (system.nodes[0]->store.tx_begin ());
 	for (auto & works : response.json.get_child ("works"))
 	{
 		std::string account_text (works.first);
@@ -3032,7 +3026,7 @@ TEST (rpc, work_set)
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
 	request.put ("work", rai::to_string_hex (work0));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3042,7 +3036,7 @@ TEST (rpc, work_set)
 	std::string success (response.json.get<std::string> ("success"));
 	ASSERT_TRUE (success.empty ());
 	uint64_t work1 (1);
-	auto transaction (system.nodes[0]->wallets.tx_begin ());
+	auto transaction (system.nodes[0]->store.tx_begin ());
 	system.nodes[0]->wallets.items.begin ()->second->store.work_get (transaction, rai::genesis_account, work1);
 	ASSERT_EQ (work1, work0);
 }
@@ -3054,11 +3048,11 @@ TEST (rpc, search_pending_all)
 	rai::send_block block (system.nodes[0]->latest (rai::test_genesis_key.pub), rai::test_genesis_key.pub, rai::genesis_amount - system.nodes[0]->config.receive_minimum.number (), rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
 	auto transaction (system.nodes[0]->store.tx_begin (true));
 	ASSERT_EQ (rai::process_result::progress, system.nodes[0]->ledger.process (transaction, block).code);
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "search_pending_all");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3097,7 +3091,7 @@ TEST (rpc, wallet_republish)
 	request.put ("action", "wallet_republish");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 	request.put ("count", 1);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3132,7 +3126,7 @@ TEST (rpc, delegators)
 	boost::property_tree::ptree request;
 	request.put ("action", "delegators");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3167,7 +3161,7 @@ TEST (rpc, delegators_count)
 	boost::property_tree::ptree request;
 	request.put ("action", "delegators_count");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3196,7 +3190,7 @@ TEST (rpc, account_info)
 	boost::property_tree::ptree request;
 	request.put ("action", "account_info");
 	request.put ("account", rai::test_genesis_key.pub.to_account ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3226,7 +3220,7 @@ TEST (rpc, account_info)
 	request.put ("weight", "true");
 	request.put ("pending", "1");
 	request.put ("representative", "1");
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -3252,7 +3246,7 @@ TEST (rpc, blocks_info)
 	entry.put ("", system.nodes[0]->latest (rai::genesis_account).to_string ());
 	peers_l.push_back (std::make_pair ("", entry));
 	request.add_child ("hashes", peers_l);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3279,7 +3273,8 @@ TEST (rpc, blocks_info)
 	// Test for optional values
 	request.put ("source", "true");
 	request.put ("pending", "1");
-	test_response response2 (request, rpc, system.io_ctx);
+	request.put ("balance", "true");
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -3307,7 +3302,7 @@ TEST (rpc, work_peers_all)
 	request.put ("action", "work_peer_add");
 	request.put ("address", "::1");
 	request.put ("port", "0");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3318,7 +3313,7 @@ TEST (rpc, work_peers_all)
 	ASSERT_TRUE (success.empty ());
 	boost::property_tree::ptree request1;
 	request1.put ("action", "work_peers");
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -3335,7 +3330,7 @@ TEST (rpc, work_peers_all)
 	ASSERT_EQ ("::1:0", peers[0]);
 	boost::property_tree::ptree request2;
 	request2.put ("action", "work_peers_clear");
-	test_response response2 (request2, rpc, system.io_ctx);
+	test_response response2 (request2, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -3344,7 +3339,7 @@ TEST (rpc, work_peers_all)
 	ASSERT_EQ (200, response2.status);
 	success = response2.json.get<std::string> ("success", "");
 	ASSERT_TRUE (success.empty ());
-	test_response response3 (request1, rpc, system.io_ctx);
+	test_response response3 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response3.status == 0)
 	{
@@ -3367,7 +3362,7 @@ TEST (rpc, block_count_type)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "block_count_type");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3406,7 +3401,7 @@ TEST (rpc, ledger)
 	request.put ("action", "ledger");
 	request.put ("sorting", "1");
 	request.put ("count", "1");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3439,7 +3434,7 @@ TEST (rpc, ledger)
 	request.put ("weight", "1");
 	request.put ("pending", "1");
 	request.put ("representative", "true");
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -3468,7 +3463,7 @@ TEST (rpc, accounts_create)
 	request.put ("action", "accounts_create");
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 	request.put ("count", "8");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3510,7 +3505,7 @@ TEST (rpc, block_create)
 	request.put ("amount", "340282366920938463463374607431768211355");
 	request.put ("destination", key.pub.to_account ());
 	request.put ("work", rai::to_string_hex (send_work));
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3535,7 +3530,7 @@ TEST (rpc, block_create)
 	request1.put ("representative", rai::test_genesis_key.pub.to_account ());
 	request1.put ("source", send.hash ().to_string ());
 	request1.put ("work", rai::to_string_hex (open_work));
-	test_response response1 (request1, rpc, system.io_ctx);
+	test_response response1 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response1.status == 0)
 	{
@@ -3551,7 +3546,7 @@ TEST (rpc, block_create)
 	ASSERT_EQ (open.hash (), open_block->hash ());
 	ASSERT_EQ (rai::process_result::progress, system.nodes[0]->process (open).code);
 	request1.put ("representative", key.pub.to_account ());
-	test_response response2 (request1, rpc, system.io_ctx);
+	test_response response2 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -3564,7 +3559,7 @@ TEST (rpc, block_create)
 	rai::change_block change (open.hash (), key.pub, key.prv, key.pub, change_work);
 	request1.put ("type", "change");
 	request1.put ("work", rai::to_string_hex (change_work));
-	test_response response4 (request1, rpc, system.io_ctx);
+	test_response response4 (request1, rpc, system.service);
 	system.deadline_set (5s);
 	while (response4.status == 0)
 	{
@@ -3589,7 +3584,7 @@ TEST (rpc, block_create)
 	request2.put ("source", send2.hash ().to_string ());
 	request2.put ("previous", change.hash ().to_string ());
 	request2.put ("work", rai::to_string_hex (node1.work_generate_blocking (change.hash ())));
-	test_response response5 (request2, rpc, system.io_ctx);
+	test_response response5 (request2, rpc, system.service);
 	system.deadline_set (5s);
 	while (response5.status == 0)
 	{
@@ -3625,7 +3620,7 @@ TEST (rpc, block_create_state)
 	request.put ("work", rai::to_string_hex (system.nodes[0]->work_generate_blocking (genesis.hash ())));
 	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3665,7 +3660,7 @@ TEST (rpc, block_create_state_open)
 	request.put ("work", rai::to_string_hex (system.nodes[0]->work_generate_blocking (send_block->hash ())));
 	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3712,7 +3707,7 @@ TEST (rpc, block_create_state_request_work)
 		request.put ("previous", previous);
 		rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
 		rpc.start ();
-		test_response response (request, rpc, system.io_ctx);
+		test_response response (request, rpc, system.service);
 		system.deadline_set (5s);
 		while (response.status == 0)
 		{
@@ -3742,7 +3737,7 @@ TEST (rpc, block_hash)
 	std::string json;
 	send.serialize_json (json);
 	request.put ("block", json);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3767,7 +3762,7 @@ TEST (rpc, wallet_lock)
 	}
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_lock");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3790,7 +3785,7 @@ TEST (rpc, wallet_locked)
 	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
 	request.put ("wallet", wallet);
 	request.put ("action", "wallet_locked");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3815,7 +3810,7 @@ TEST (rpc, wallet_create_fail)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "wallet_create");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3844,7 +3839,7 @@ TEST (rpc, wallet_ledger)
 	request.put ("wallet", system.nodes[0]->wallets.items.begin ()->first.to_string ());
 	request.put ("sorting", "1");
 	request.put ("count", "1");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3877,7 +3872,7 @@ TEST (rpc, wallet_ledger)
 	request.put ("weight", "true");
 	request.put ("pending", "1");
 	request.put ("representative", "false");
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response2.status == 0)
 	{
@@ -3911,7 +3906,7 @@ TEST (rpc, wallet_add_watch)
 	entry.put ("", rai::test_genesis_key.pub.to_account ());
 	peers_l.push_back (std::make_pair ("", entry));
 	request.add_child ("accounts", peers_l);
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3939,7 +3934,8 @@ TEST (rpc, online_reps)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "representatives_online");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
+	system.deadline_set (5s);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -3949,16 +3945,12 @@ TEST (rpc, online_reps)
 	auto representatives (response.json.get_child ("representatives"));
 	auto item (representatives.begin ());
 	ASSERT_NE (representatives.end (), item);
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), item->second.get<std::string> (""));
+	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), item->first);
 	boost::optional<std::string> weight (item->second.get_optional<std::string> ("weight"));
 	ASSERT_FALSE (weight.is_initialized ());
-	while (system.nodes[1]->block (send_block->hash ()) == nullptr)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
 	//Test weight option
 	request.put ("weight", "true");
-	test_response response2 (request, rpc, system.io_ctx);
+	test_response response2 (request, rpc, system.service);
 	while (response2.status == 0)
 	{
 		ASSERT_NO_ERROR (system.poll ());
@@ -3974,22 +3966,10 @@ TEST (rpc, online_reps)
 	auto new_rep (system.wallet (1)->deterministic_insert ());
 	auto send (system.wallet (1)->send_action (rai::test_genesis_key.pub, new_rep, system.nodes[0]->config.receive_minimum.number ()));
 	ASSERT_NE (nullptr, send);
-	while (system.nodes[1]->block (send->hash ()) == nullptr)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
-	auto receive (system.wallet (1)->receive_action (*send, new_rep, system.nodes[0]->config.receive_minimum.number ()));
+	auto receive (system.wallet (1)->receive_action (static_cast<rai::send_block &> (*send), new_rep, system.nodes[0]->config.receive_minimum.number ()));
 	ASSERT_NE (nullptr, receive);
-	while (system.nodes[1]->block (receive->hash ()) == nullptr)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
 	auto change (system.wallet (1)->change_action (rai::test_genesis_key.pub, new_rep));
 	ASSERT_NE (nullptr, change);
-	while (system.nodes[1]->block (change->hash ()) == nullptr)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
 	system.deadline_set (5s);
 	while (system.nodes[1]->online_reps.list ().size () != 2)
 	{
@@ -4000,7 +3980,7 @@ TEST (rpc, online_reps)
 	boost::property_tree::ptree filtered_accounts;
 	filtered_accounts.push_back (std::make_pair ("", child_rep));
 	request.add_child ("accounts", filtered_accounts);
-	test_response response3 (request, rpc, system.io_ctx);
+	test_response response3 (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response3.status == 0)
 	{
@@ -4030,7 +4010,7 @@ TEST (rpc, confirmation_history)
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "confirmation_history");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -4108,7 +4088,7 @@ TEST (rpc, block_confirm)
 	boost::property_tree::ptree request;
 	request.put ("action", "block_confirm");
 	request.put ("hash", send1->hash ().to_string ());
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -4127,7 +4107,7 @@ TEST (rpc, block_confirm_absent)
 	boost::property_tree::ptree request;
 	request.put ("action", "block_confirm");
 	request.put ("hash", "0");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -4140,11 +4120,11 @@ TEST (rpc, block_confirm_absent)
 TEST (rpc, node_id)
 {
 	rai::system system (24000, 1);
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	boost::property_tree::ptree request;
 	request.put ("action", "node_id");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -4160,7 +4140,7 @@ TEST (rpc, node_id)
 TEST (rpc, node_id_delete)
 {
 	rai::system system (24000, 1);
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
+	rai::rpc rpc (system.service, *system.nodes[0], rai::rpc_config (true));
 	rpc.start ();
 	{
 		auto transaction (system.nodes[0]->store.tx_begin_write ());
@@ -4169,7 +4149,7 @@ TEST (rpc, node_id_delete)
 	}
 	boost::property_tree::ptree request;
 	request.put ("action", "node_id_delete");
-	test_response response (request, rpc, system.io_ctx);
+	test_response response (request, rpc, system.service);
 	system.deadline_set (5s);
 	while (response.status == 0)
 	{
@@ -4180,203 +4160,4 @@ TEST (rpc, node_id_delete)
 	auto transaction (system.nodes[0]->store.tx_begin_write ());
 	rai::keypair node_id (system.nodes[0]->store.get_node_id (transaction));
 	ASSERT_NE (node_id.pub.to_string (), system.nodes[0]->node_id.pub.to_string ());
-}
-
-TEST (rpc, stats_clear)
-{
-	rai::system system (24000, 1);
-	rai::keypair key;
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
-	rpc.start ();
-	system.nodes[0]->stats.inc (rai::stat::type::ledger, rai::stat::dir::in);
-	ASSERT_EQ (1, system.nodes[0]->stats.count (rai::stat::type::ledger, rai::stat::dir::in));
-	boost::property_tree::ptree request;
-	request.put ("action", "stats_clear");
-	test_response response (request, rpc, system.io_ctx);
-	system.deadline_set (5s);
-	while (response.status == 0)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
-	std::string success (response.json.get<std::string> ("success"));
-	ASSERT_TRUE (success.empty ());
-	ASSERT_EQ (0, system.nodes[0]->stats.count (rai::stat::type::ledger, rai::stat::dir::in));
-	ASSERT_LE (system.nodes[0]->stats.last_reset ().count (), 5);
-}
-
-TEST (rpc, uptime)
-{
-	rai::system system (24000, 1);
-	rai::rpc rpc (system.io_ctx, *system.nodes[0], rai::rpc_config (true));
-	rpc.start ();
-	boost::property_tree::ptree request;
-	request.put ("action", "uptime");
-	std::this_thread::sleep_for (std::chrono::seconds (1));
-	test_response response (request, rpc, system.io_ctx);
-	system.deadline_set (5s);
-	while (response.status == 0)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
-	ASSERT_EQ (200, response.status);
-	ASSERT_LE (1, response.json.get<int> ("seconds"));
-}
-
-TEST (rpc, wallet_history)
-{
-	rai::system system (24000, 1);
-	auto node0 (system.nodes[0]);
-	rai::genesis genesis;
-	system.wallet (0)->insert_adhoc (rai::test_genesis_key.prv);
-	auto timestamp1 (rai::seconds_since_epoch ());
-	auto send (system.wallet (0)->send_action (rai::test_genesis_key.pub, rai::test_genesis_key.pub, node0->config.receive_minimum.number ()));
-	ASSERT_NE (nullptr, send);
-	std::this_thread::sleep_for (std::chrono::milliseconds (1000));
-	auto timestamp2 (rai::seconds_since_epoch ());
-	auto receive (system.wallet (0)->receive_action (static_cast<rai::send_block &> (*send), rai::test_genesis_key.pub, node0->config.receive_minimum.number ()));
-	ASSERT_NE (nullptr, receive);
-	rai::keypair key;
-	std::this_thread::sleep_for (std::chrono::milliseconds (1000));
-	auto timestamp3 (rai::seconds_since_epoch ());
-	auto send2 (system.wallet (0)->send_action (rai::test_genesis_key.pub, key.pub, node0->config.receive_minimum.number ()));
-	ASSERT_NE (nullptr, send2);
-	system.deadline_set (10s);
-	rai::rpc rpc (system.io_ctx, *node0, rai::rpc_config (true));
-	rpc.start ();
-	boost::property_tree::ptree request;
-	request.put ("action", "wallet_history");
-	request.put ("wallet", node0->wallets.items.begin ()->first.to_string ());
-	test_response response (request, rpc, system.io_ctx);
-	system.deadline_set (5s);
-	while (response.status == 0)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
-	ASSERT_EQ (200, response.status);
-	std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string, std::string>> history_l;
-	auto & history_node (response.json.get_child ("history"));
-	for (auto i (history_node.begin ()), n (history_node.end ()); i != n; ++i)
-	{
-		history_l.push_back (std::make_tuple (i->second.get<std::string> ("type"), i->second.get<std::string> ("account"), i->second.get<std::string> ("amount"), i->second.get<std::string> ("hash"), i->second.get<std::string> ("block_account"), i->second.get<std::string> ("local_timestamp")));
-	}
-	ASSERT_EQ (4, history_l.size ());
-	ASSERT_EQ ("send", std::get<0> (history_l[0]));
-	ASSERT_EQ (key.pub.to_account (), std::get<1> (history_l[0]));
-	ASSERT_EQ (node0->config.receive_minimum.to_string_dec (), std::get<2> (history_l[0]));
-	ASSERT_EQ (send2->hash ().to_string (), std::get<3> (history_l[0]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<4> (history_l[0]));
-	ASSERT_EQ (std::to_string (timestamp3), std::get<5> (history_l[0]));
-	ASSERT_EQ ("receive", std::get<0> (history_l[1]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<1> (history_l[1]));
-	ASSERT_EQ (node0->config.receive_minimum.to_string_dec (), std::get<2> (history_l[1]));
-	ASSERT_EQ (receive->hash ().to_string (), std::get<3> (history_l[1]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<4> (history_l[1]));
-	ASSERT_EQ (std::to_string (timestamp2), std::get<5> (history_l[1]));
-	ASSERT_EQ ("send", std::get<0> (history_l[2]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<1> (history_l[2]));
-	ASSERT_EQ (node0->config.receive_minimum.to_string_dec (), std::get<2> (history_l[2]));
-	ASSERT_EQ (send->hash ().to_string (), std::get<3> (history_l[2]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<4> (history_l[2]));
-	ASSERT_EQ (std::to_string (timestamp1), std::get<5> (history_l[2]));
-	// Genesis block
-	ASSERT_EQ ("receive", std::get<0> (history_l[3]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<1> (history_l[3]));
-	ASSERT_EQ (rai::genesis_amount.convert_to<std::string> (), std::get<2> (history_l[3]));
-	ASSERT_EQ (genesis.hash ().to_string (), std::get<3> (history_l[3]));
-	ASSERT_EQ (rai::test_genesis_key.pub.to_account (), std::get<4> (history_l[3]));
-}
-
-TEST (rpc, sign_hash)
-{
-	rai::system system (24000, 1);
-	rai::keypair key;
-	auto & node1 (*system.nodes[0]);
-	rai::state_block send (rai::genesis_account, node1.latest (rai::test_genesis_key.pub), rai::genesis_account, rai::genesis_amount - rai::Gice_ratio, key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	rai::rpc rpc (system.io_ctx, node1, rai::rpc_config (true));
-	rpc.start ();
-	boost::property_tree::ptree request;
-	request.put ("action", "sign");
-	request.put ("hash", send.hash ().to_string ());
-	request.put ("key", key.prv.data.to_string ());
-	test_response response (request, rpc, system.io_ctx);
-	while (response.status == 0)
-	{
-		system.poll ();
-	}
-	ASSERT_EQ (200, response.status);
-	std::error_code ec (rai::error_rpc::sign_hash_disabled);
-	ASSERT_EQ (response.json.get<std::string> ("error"), ec.message ());
-	rpc.config.enable_sign_hash = true;
-	test_response response2 (request, rpc, system.io_ctx);
-	while (response2.status == 0)
-	{
-		system.poll ();
-	}
-	ASSERT_EQ (200, response2.status);
-	rai::signature signature;
-	std::string signature_text (response2.json.get<std::string> ("signature"));
-	ASSERT_FALSE (signature.decode_hex (signature_text));
-	ASSERT_FALSE (rai::validate_message (key.pub, send.hash (), signature));
-}
-
-TEST (rpc, sign_block)
-{
-	rai::system system (24000, 1);
-	rai::keypair key;
-	auto & node1 (*system.nodes[0]);
-	rai::state_block send (rai::genesis_account, node1.latest (rai::test_genesis_key.pub), rai::genesis_account, rai::genesis_amount - rai::Gice_ratio, key.pub, rai::test_genesis_key.prv, rai::test_genesis_key.pub, 0);
-	rai::rpc rpc (system.io_ctx, node1, rai::rpc_config (true));
-	rpc.start ();
-	boost::property_tree::ptree request;
-	request.put ("action", "sign");
-	system.wallet (0)->insert_adhoc (key.prv);
-	std::string wallet;
-	system.nodes[0]->wallets.items.begin ()->first.encode_hex (wallet);
-	request.put ("wallet", wallet);
-	request.put ("account", key.pub.to_account ());
-	std::string json;
-	send.serialize_json (json);
-	request.put ("block", json);
-	test_response response (request, rpc, system.io_ctx);
-	while (response.status == 0)
-	{
-		system.poll ();
-	}
-	ASSERT_EQ (200, response.status);
-	auto contents (response.json.get<std::string> ("block"));
-	boost::property_tree::ptree block_l;
-	std::stringstream block_stream (contents);
-	boost::property_tree::read_json (block_stream, block_l);
-	auto block (rai::deserialize_block_json (block_l));
-	ASSERT_FALSE (rai::validate_message (key.pub, send.hash (), block->block_signature ()));
-	ASSERT_NE (block->block_signature (), send.block_signature ());
-	ASSERT_EQ (block->hash (), send.hash ());
-}
-
-TEST (rpc, memory_stats)
-{
-	rai::system system (24000, 1);
-	auto node = system.nodes.front ();
-	rai::rpc rpc (system.io_ctx, *node, rai::rpc_config (true));
-
-	// Preliminary test adding to the vote uniquer and checking json output is correct
-	rai::keypair key;
-	auto block (std::make_shared<rai::state_block> (0, 0, 0, 0, 0, key.prv, key.pub, 0));
-	std::vector<rai::block_hash> hashes;
-	hashes.push_back (block->hash ());
-	auto vote (std::make_shared<rai::vote> (key.pub, key.prv, 0, hashes));
-	node->vote_uniquer.unique (vote);
-	rpc.start ();
-	boost::property_tree::ptree request;
-	request.put ("action", "stats");
-	request.put ("type", "objects");
-	test_response response (request, rpc, system.io_ctx);
-	system.deadline_set (5s);
-	while (response.status == 0)
-	{
-		ASSERT_NO_ERROR (system.poll ());
-	}
-	ASSERT_EQ (200, response.status);
-
-	ASSERT_EQ (response.json.get_child ("node").get_child ("vote_uniquer").get_child ("votes").get<std::string> ("count"), "1");
 }

@@ -11,6 +11,7 @@
 
 namespace fstbt_qt
 {
+static const QString saved_ratio_key = "settings/ratio";
 class wallet;
 class eventloop_processor : public QObject
 {
@@ -66,9 +67,9 @@ public:
 	QHBoxLayout * scale_layout;
 	QLabel * scale_label;
 	QButtonGroup * ratio_group;
-	QRadioButton * mice;
-	QRadioButton * kice;
-	QRadioButton * ice;
+	QRadioButton * mice_unit;
+	QRadioButton * kice_unit;
+	QRadioButton * ice_unit;
 	QPushButton * back;
 
 	QWidget * ledger_window;
@@ -150,7 +151,7 @@ class self_pane
 {
 public:
 	self_pane (fstbt_qt::wallet &, rai::account const &);
-	void refresh_balance ();
+	void set_balance_text (std::pair<rai::uint128_t, rai::uint128_t>);
 	QWidget * window;
 	QVBoxLayout * layout;
 	QHBoxLayout * self_layout;
@@ -350,5 +351,7 @@ public:
 	fstbt_qt::status active_status;
 	void pop_main_stack ();
 	void push_main_stack (QWidget *);
+	void ongoing_refresh ();
+	std::atomic<bool> needs_balance_refresh;
 };
 }
