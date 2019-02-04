@@ -33,3 +33,4 @@ void rai::set_secure_perm_file (boost::filesystem::path const & path, boost::sys
 {
 	boost::filesystem::permissions (path, boost::filesystem::owner_read | boost::filesystem::owner_write, ec);
 }
+
