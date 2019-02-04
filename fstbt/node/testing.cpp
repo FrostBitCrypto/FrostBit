@@ -43,9 +43,9 @@ work (1, nullptr)
 	for (auto i (nodes.begin ()), j (nodes.begin () + 1), n (nodes.end ()); j != n; ++i, ++j)
 	{
 		auto starting1 ((*i)->peers.size ());
-		auto new1 (starting1);
+		decltype (starting1) new1;
 		auto starting2 ((*j)->peers.size ());
-		auto new2 (starting2);
+		decltype (starting2) new2;
 		(*j)->network.send_keepalive ((*i)->network.endpoint ());
 		do
 		{
@@ -87,7 +87,7 @@ std::shared_ptr<rai::wallet> rai::system::wallet (size_t index_a)
 	return nodes[index_a]->wallets.items.begin ()->second;
 }
 
-rai::account rai::system::account (MDB_txn * transaction_a, size_t index_a)
+rai::account rai::system::account (rai::transaction const & transaction_a, size_t index_a)
 {
 	auto wallet_l (wallet (index_a));
 	auto keys (wallet_l->store.begin (transaction_a));
@@ -97,22 +97,20 @@ rai::account rai::system::account (MDB_txn * transaction_a, size_t index_a)
 	return rai::account (result);
 }
 
-void rai::system::deadline_set (const std::chrono::duration<double, std::nano> & delta_a)
+void rai::system::deadline_set (std::chrono::duration<double, std::nano> const & delta_a)
 {
 	deadline = std::chrono::steady_clock::now () + delta_a * deadline_scaling_factor;
 }
 
-std::error_code rai::system::poll (const std::chrono::nanoseconds & sleep_time)
+std::error_code rai::system::poll (std::chrono::nanoseconds const & wait_time)
 {
 	std::error_code ec;
-	if (service.poll_one () == 0)
-	{
-		std::this_thread::sleep_for (sleep_time);
-	}
+	service.run_one_for (wait_time);
 
 	if (std::chrono::steady_clock::now () > deadline)
 	{
 		ec = rai::error_system::deadline_expired;
+		stop ();
 	}
 	return ec;
 }
@@ -166,7 +164,7 @@ void rai::system::generate_usage_traffic (uint32_t count_a, uint32_t wait_a, siz
 
 void rai::system::generate_rollback (rai::node & node_a, std::vector<rai::account> & accounts_a)
 {
-	rai::transaction transaction (node_a.store.environment, true);
+	auto transaction (node_a.store.tx_begin_write ());
 	auto index (random_pool.GenerateWord32 (0, accounts_a.size () - 1));
 	auto account (accounts_a[index]);
 	rai::account_info info;
@@ -188,14 +186,13 @@ void rai::system::generate_receive (rai::node & node_a)
 {
 	std::shared_ptr<rai::block> send_block;
 	{
-		rai::transaction transaction (node_a.store.environment, false);
+		auto transaction (node_a.store.tx_begin_read ());
 		rai::uint256_union random_block;
 		random_pool.GenerateBlock (random_block.bytes.data (), sizeof (random_block.bytes));
 		auto i (node_a.store.pending_begin (transaction, rai::pending_key (random_block, 0)));
 		if (i != node_a.store.pending_end ())
 		{
 			rai::pending_key send_hash (i->first);
-			rai::pending_info info (i->second);
 			send_block = node_a.store.block_get (transaction, send_hash.hash);
 		}
 	}
@@ -242,7 +239,7 @@ rai::account rai::system::get_random_account (std::vector<rai::account> & accoun
 	return result;
 }
 
-rai::uint128_t rai::system::get_random_amount (MDB_txn * transaction_a, rai::node & node_a, rai::account const & account_a)
+rai::uint128_t rai::system::get_random_amount (rai::transaction const & transaction_a, rai::node & node_a, rai::account const & account_a)
 {
 	rai::uint128_t balance (node_a.ledger.account_balance (transaction_a, account_a));
 	std::string balance_text (balance.convert_to<std::string> ());
@@ -261,7 +258,7 @@ void rai::system::generate_send_existing (rai::node & node_a, std::vector<rai::a
 	{
 		rai::account account;
 		random_pool.GenerateBlock (account.bytes.data (), sizeof (account.bytes));
-		rai::transaction transaction (node_a.store.environment, false);
+		auto transaction (node_a.store.tx_begin_read ());
 		rai::store_iterator<rai::account, rai::account_info> entry (node_a.store.latest_begin (transaction, account));
 		if (entry == node_a.store.latest_end ())
 		{
@@ -308,7 +305,7 @@ void rai::system::generate_send_new (rai::node & node_a, std::vector<rai::accoun
 	rai::uint128_t amount;
 	rai::account source;
 	{
-		rai::transaction transaction (node_a.store.environment, false);
+		auto transaction (node_a.store.tx_begin_read ());
 		source = get_random_account (accounts_a);
 		amount = get_random_amount (transaction, node_a, source);
 	}
@@ -336,7 +333,7 @@ void rai::system::generate_mass_activity (uint32_t count_a, rai::node & node_a)
 			uint64_t count (0);
 			uint64_t state (0);
 			{
-				rai::transaction transaction (node_a.store.environment, false);
+				auto transaction (node_a.store.tx_begin_read ());
 				auto block_counts (node_a.store.block_count (transaction));
 				count = block_counts.sum ();
 				state = block_counts.state_v0 + block_counts.state_v1;

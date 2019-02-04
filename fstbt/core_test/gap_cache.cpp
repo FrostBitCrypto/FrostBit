@@ -10,7 +10,7 @@ TEST (gap_cache, add_new)
 	rai::gap_cache cache (*system.nodes[0]);
 	auto block1 (std::make_shared<rai::send_block> (0, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (system.nodes[0]->store.tx_begin (true));
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 }
 
 TEST (gap_cache, add_existing)
@@ -19,13 +19,13 @@ TEST (gap_cache, add_existing)
 	rai::gap_cache cache (*system.nodes[0]);
 	auto block1 (std::make_shared<rai::send_block> (0, 1, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (system.nodes[0]->store.tx_begin (true));
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 	auto existing1 (cache.blocks.get<1> ().find (block1->hash ()));
 	ASSERT_NE (cache.blocks.get<1> ().end (), existing1);
 	auto arrival (existing1->arrival);
 	while (arrival == std::chrono::steady_clock::now ())
 		;
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 	ASSERT_EQ (1, cache.blocks.size ());
 	auto existing2 (cache.blocks.get<1> ().find (block1->hash ()));
 	ASSERT_NE (cache.blocks.get<1> ().end (), existing2);
@@ -38,14 +38,14 @@ TEST (gap_cache, comparison)
 	rai::gap_cache cache (*system.nodes[0]);
 	auto block1 (std::make_shared<rai::send_block> (1, 0, 2, rai::keypair ().prv, 4, 5));
 	auto transaction (system.nodes[0]->store.tx_begin (true));
-	cache.add (transaction, block1->hash ());
+	cache.add (transaction, block1);
 	auto existing1 (cache.blocks.get<1> ().find (block1->hash ()));
 	ASSERT_NE (cache.blocks.get<1> ().end (), existing1);
 	auto arrival (existing1->arrival);
 	while (std::chrono::steady_clock::now () == arrival)
 		;
 	auto block3 (std::make_shared<rai::send_block> (0, 42, 1, rai::keypair ().prv, 3, 4));
-	cache.add (transaction, block3->hash ());
+	cache.add (transaction, block3);
 	ASSERT_EQ (2, cache.blocks.size ());
 	auto existing2 (cache.blocks.get<1> ().find (block3->hash ()));
 	ASSERT_NE (cache.blocks.get<1> ().end (), existing2);
@@ -61,7 +61,7 @@ TEST (gap_cache, gap_bootstrap)
 	auto send (std::make_shared<rai::send_block> (latest, key.pub, rai::genesis_amount - 100, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (latest)));
 	{
 		auto transaction (system.nodes[0]->store.tx_begin (true));
-		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->block_processor.process_one (transaction, send).code);
+		ASSERT_EQ (rai::process_result::progress, system.nodes[0]->block_processor.process_receive_one (transaction, send).code);
 	}
 	ASSERT_EQ (rai::genesis_amount - 100, system.nodes[0]->balance (rai::genesis_account));
 	ASSERT_EQ (rai::genesis_amount, system.nodes[1]->balance (rai::genesis_account));
@@ -93,13 +93,13 @@ TEST (gap_cache, two_dependencies)
 	auto send2 (std::make_shared<rai::send_block> (send1->hash (), key.pub, 0, rai::test_genesis_key.prv, rai::test_genesis_key.pub, system.work.generate (send1->hash ())));
 	auto open (std::make_shared<rai::open_block> (send1->hash (), key.pub, key.pub, key.prv, key.pub, system.work.generate (key.pub)));
 	ASSERT_EQ (0, system.nodes[0]->gap_cache.blocks.size ());
-	system.nodes[0]->block_processor.add (send2, rai::seconds_since_epoch ());
+	system.nodes[0]->block_processor.add (send2, std::chrono::steady_clock::now ());
 	system.nodes[0]->block_processor.flush ();
 	ASSERT_EQ (1, system.nodes[0]->gap_cache.blocks.size ());
-	system.nodes[0]->block_processor.add (open, rai::seconds_since_epoch ());
+	system.nodes[0]->block_processor.add (open, std::chrono::steady_clock::now ());
 	system.nodes[0]->block_processor.flush ();
 	ASSERT_EQ (2, system.nodes[0]->gap_cache.blocks.size ());
-	system.nodes[0]->block_processor.add (send1, rai::seconds_since_epoch ());
+	system.nodes[0]->block_processor.add (send1, std::chrono::steady_clock::now ());
 	system.nodes[0]->block_processor.flush ();
 	ASSERT_EQ (0, system.nodes[0]->gap_cache.blocks.size ());
 	auto transaction (system.nodes[0]->store.tx_begin ());

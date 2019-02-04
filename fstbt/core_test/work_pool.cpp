@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <fstbt/lib/jsonconfig.hpp>
+
 #include <fstbt/node/node.hpp>
 #include <fstbt/node/wallet.hpp>
 
@@ -71,7 +71,7 @@ TEST (work, DISABLED_opencl)
 		rai::work_pool pool (std::numeric_limits<unsigned>::max (), opencl ? [&opencl](rai::uint256_union const & root_a) {
 			return opencl->generate_work (root_a);
 		}
-		                                                                    : std::function<boost::optional<uint64_t> (rai::uint256_union const &)> (nullptr));
+		                                                                   : std::function<boost::optional<uint64_t> (rai::uint256_union const &)> (nullptr));
 		ASSERT_NE (nullptr, pool.opencl);
 		rai::uint256_union root;
 		for (auto i (0); i < 1; ++i)
@@ -89,7 +89,7 @@ TEST (work, opencl_config)
 	config1.platform = 1;
 	config1.device = 2;
 	config1.threads = 3;
-	rai::jsonconfig tree;
+	boost::property_tree::ptree tree;
 	config1.serialize_json (tree);
 	rai::opencl_config config2;
 	ASSERT_FALSE (config2.deserialize_json (tree));
