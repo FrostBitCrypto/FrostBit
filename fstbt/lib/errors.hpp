@@ -8,7 +8,7 @@
 using tl::expected;
 using tl::make_unexpected;
 
-namespace nano
+namespace rai
 {
 /** Returns the error code if non-zero, otherwise the value */
 template <class T>
@@ -155,7 +155,7 @@ enum class error_process
 		};                                                                                                                   \
 	}
 
-REGISTER_ERROR_CODES (nano, error_common);
-REGISTER_ERROR_CODES (nano, error_blocks);
-REGISTER_ERROR_CODES (nano, error_rpc);
-REGISTER_ERROR_CODES (nano, error_process);
+REGISTER_ERROR_CODES (rai, error_common);
+REGISTER_ERROR_CODES (rai, error_blocks);
+REGISTER_ERROR_CODES (rai, error_rpc);
+REGISTER_ERROR_CODES (rai, error_process);

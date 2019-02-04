@@ -246,10 +246,6 @@ public:
 		invalid_node_id_handshake_message,
 		outdated_version,
 
-		// udp
-		blocking,
-		overflow,
-
 		// peering
 		handshake,
 	};
