@@ -237,12 +237,12 @@ std::shared_ptr<rai::wallet> rai::rpc_handler::wallet_impl ()
 			}
 			else
 			{
-				ec = rai::error_common::wallet_not_found;
+				ec = nano::error_common::wallet_not_found;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::bad_wallet_number;
+			ec = nano::error_common::bad_wallet_number;
 		}
 	}
 	return nullptr;
@@ -259,7 +259,7 @@ rai::account rai::rpc_handler::account_impl (std::string account_text)
 		}
 		if (result.decode_account (account_text))
 		{
-			ec = rai::error_common::bad_account_number;
+			ec = nano::error_common::bad_account_number;
 		}
 	}
 	return result;
@@ -273,7 +273,7 @@ rai::amount rai::rpc_handler::amount_impl ()
 		std::string amount_text (request.get<std::string> ("amount"));
 		if (result.decode_dec (amount_text))
 		{
-			ec = rai::error_common::invalid_amount;
+			ec = nano::error_common::invalid_amount;
 		}
 	}
 	return result;
@@ -287,7 +287,7 @@ rai::block_hash rai::rpc_handler::hash_impl (std::string search_text)
 		std::string hash_text (request.get<std::string> (search_text));
 		if (result.decode_hex (hash_text))
 		{
-			ec = rai::error_blocks::invalid_block_hash;
+			ec = nano::error_blocks::invalid_block_hash;
 		}
 	}
 	return result;
@@ -301,7 +301,7 @@ rai::amount rai::rpc_handler::threshold_optional_impl ()
 	{
 		if (result.decode_dec (threshold_text.get ()))
 		{
-			ec = rai::error_common::bad_threshold;
+			ec = nano::error_common::bad_threshold;
 		}
 	}
 	return result;
@@ -315,7 +315,7 @@ uint64_t rai::rpc_handler::work_optional_impl ()
 	{
 		if (rai::from_string_hex (work_text.get (), result))
 		{
-			ec = rai::error_common::bad_work_format;
+			ec = nano::error_common::bad_work_format;
 		}
 	}
 	return result;
@@ -353,7 +353,7 @@ uint64_t rai::rpc_handler::count_impl ()
 		std::string count_text (request.get<std::string> ("count"));
 		if (decode_unsigned (count_text, result) || result == 0)
 		{
-			ec = rai::error_common::invalid_count;
+			ec = nano::error_common::invalid_count;
 		}
 	}
 	return result;
@@ -366,7 +366,7 @@ uint64_t rai::rpc_handler::count_optional_impl (uint64_t result)
 	{
 		if (decode_unsigned (count_text.get (), result))
 		{
-			ec = rai::error_common::invalid_count;
+			ec = nano::error_common::invalid_count;
 		}
 	}
 	return result;
@@ -379,7 +379,7 @@ bool rai::rpc_handler::rpc_control_impl ()
 	{
 		if (!rpc.config.enable_control)
 		{
-			ec = rai::error_rpc::rpc_control_disabled;
+			ec = nano::error_rpc::rpc_control_disabled;
 		}
 		else
 		{
@@ -414,7 +414,7 @@ void rai::rpc_handler::account_block_count ()
 		}
 		else
 		{
-			ec = rai::error_common::account_not_found;
+			ec = nano::error_common::account_not_found;
 		}
 	}
 	response_errors ();
@@ -434,7 +434,7 @@ void rai::rpc_handler::account_create ()
 		}
 		else
 		{
-			ec = rai::error_common::wallet_locked;
+			ec = nano::error_common::wallet_locked;
 		}
 	}
 	response_errors ();
@@ -450,7 +450,7 @@ void rai::rpc_handler::account_get ()
 	}
 	else
 	{
-		ec = rai::error_common::bad_public_key;
+		ec = nano::error_common::bad_public_key;
 	}
 	response_errors ();
 }
@@ -495,7 +495,7 @@ void rai::rpc_handler::account_info ()
 		}
 		else
 		{
-			ec = rai::error_common::account_not_found;
+			ec = nano::error_common::account_not_found;
 		}
 	}
 	response_errors ();
@@ -557,12 +557,12 @@ void rai::rpc_handler::account_move ()
 			}
 			else
 			{
-				ec = rai::error_rpc::source_not_found;
+				ec = nano::error_rpc::source_not_found;
 			}
 		}
 		else
 		{
-			ec = rai::error_rpc::bad_source;
+			ec = nano::error_rpc::bad_source;
 		}
 	}
 	response_errors ();
@@ -585,12 +585,12 @@ void rai::rpc_handler::account_remove ()
 			}
 			else
 			{
-				ec = rai::error_common::account_not_found_wallet;
+				ec = nano::error_common::account_not_found_wallet;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::wallet_locked;
+			ec = nano::error_common::wallet_locked;
 		}
 	}
 	response_errors ();
@@ -611,7 +611,7 @@ void rai::rpc_handler::account_representative ()
 		}
 		else
 		{
-			ec = rai::error_common::account_not_found;
+			ec = nano::error_common::account_not_found;
 		}
 	}
 	response_errors ();
@@ -643,17 +643,17 @@ void rai::rpc_handler::account_representative_set ()
 						}
 						else
 						{
-							ec = rai::error_common::invalid_work;
+							ec = nano::error_common::invalid_work;
 						}
 					}
 					else
 					{
-						ec = rai::error_common::account_not_found;
+						ec = nano::error_common::account_not_found;
 					}
 				}
 				else
 				{
-					ec = rai::error_common::wallet_locked;
+					ec = nano::error_common::wallet_locked;
 				}
 			}
 			if (!ec)
@@ -674,7 +674,7 @@ void rai::rpc_handler::account_representative_set ()
 		}
 		else
 		{
-			ec = rai::error_rpc::bad_representative_number;
+			ec = nano::error_rpc::bad_representative_number;
 		}
 	}
 	// Because of change_async
@@ -837,7 +837,7 @@ void rai::rpc_handler::block ()
 		}
 		else
 		{
-			ec = rai::error_blocks::not_found;
+			ec = nano::error_blocks::not_found;
 		}
 	}
 	response_errors ();
@@ -857,7 +857,7 @@ void rai::rpc_handler::block_confirm ()
 		}
 		else
 		{
-			ec = rai::error_blocks::not_found;
+			ec = nano::error_blocks::not_found;
 		}
 	}
 	response_errors ();
@@ -885,12 +885,12 @@ void rai::rpc_handler::blocks ()
 				}
 				else
 				{
-					ec = rai::error_blocks::not_found;
+					ec = nano::error_blocks::not_found;
 				}
 			}
 			else
 			{
-				ec = rai::error_blocks::bad_hash_number;
+				ec = nano::error_blocks::bad_hash_number;
 			}
 		}
 	}
@@ -958,12 +958,12 @@ void rai::rpc_handler::blocks_info ()
 				}
 				else
 				{
-					ec = rai::error_blocks::not_found;
+					ec = nano::error_blocks::not_found;
 				}
 			}
 			else
 			{
-				ec = rai::error_blocks::bad_hash_number;
+				ec = nano::error_blocks::bad_hash_number;
 			}
 		}
 	}
@@ -984,7 +984,7 @@ void rai::rpc_handler::block_account ()
 		}
 		else
 		{
-			ec = rai::error_blocks::not_found;
+			ec = nano::error_blocks::not_found;
 		}
 	}
 	response_errors ();
@@ -1024,7 +1024,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (wallet.decode_hex (wallet_text.get ()))
 			{
-				ec = rai::error_common::bad_wallet_number;
+				ec = nano::error_common::bad_wallet_number;
 			}
 		}
 		rai::uint256_union account (0);
@@ -1033,7 +1033,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (account.decode_account (account_text.get ()))
 			{
-				ec = rai::error_common::bad_account_number;
+				ec = nano::error_common::bad_account_number;
 			}
 		}
 		rai::uint256_union representative (0);
@@ -1042,7 +1042,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (representative.decode_account (representative_text.get ()))
 			{
-				ec = rai::error_rpc::bad_representative_number;
+				ec = nano::error_rpc::bad_representative_number;
 			}
 		}
 		rai::uint256_union destination (0);
@@ -1051,7 +1051,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (destination.decode_account (destination_text.get ()))
 			{
-				ec = rai::error_rpc::bad_destination;
+				ec = nano::error_rpc::bad_destination;
 			}
 		}
 		rai::block_hash source (0);
@@ -1060,7 +1060,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (source.decode_hex (source_text.get ()))
 			{
-				ec = rai::error_rpc::bad_source;
+				ec = nano::error_rpc::bad_source;
 			}
 		}
 		rai::uint128_union amount (0);
@@ -1069,7 +1069,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (amount.decode_dec (amount_text.get ()))
 			{
-				ec = rai::error_common::invalid_amount;
+				ec = nano::error_common::invalid_amount;
 			}
 		}
 		auto work (work_optional_impl ());
@@ -1093,17 +1093,17 @@ void rai::rpc_handler::block_create ()
 					}
 					else
 					{
-						ec = rai::error_common::account_not_found_wallet;
+						ec = nano::error_common::account_not_found_wallet;
 					}
 				}
 				else
 				{
-					ec = rai::error_common::wallet_locked;
+					ec = nano::error_common::wallet_locked;
 				}
 			}
 			else
 			{
-				ec = rai::error_common::wallet_not_found;
+				ec = nano::error_common::wallet_not_found;
 			}
 		}
 		boost::optional<std::string> key_text (request.get_optional<std::string> ("key"));
@@ -1111,7 +1111,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (prv.data.decode_hex (key_text.get ()))
 			{
-				ec = rai::error_common::bad_private_key;
+				ec = nano::error_common::bad_private_key;
 			}
 		}
 		boost::optional<std::string> previous_text (request.get_optional<std::string> ("previous"));
@@ -1119,7 +1119,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (previous.decode_hex (previous_text.get ()))
 			{
-				ec = rai::error_rpc::bad_previous;
+				ec = nano::error_rpc::bad_previous;
 			}
 		}
 		boost::optional<std::string> balance_text (request.get_optional<std::string> ("balance"));
@@ -1127,7 +1127,7 @@ void rai::rpc_handler::block_create ()
 		{
 			if (balance.decode_dec (balance_text.get ()))
 			{
-				ec = rai::error_rpc::invalid_balance;
+				ec = nano::error_rpc::invalid_balance;
 			}
 		}
 		rai::uint256_union link (0);
@@ -1138,7 +1138,7 @@ void rai::rpc_handler::block_create ()
 			{
 				if (link.decode_hex (link_text.get ()))
 				{
-					ec = rai::error_rpc::bad_link;
+					ec = nano::error_rpc::bad_link;
 				}
 			}
 		}
@@ -1163,7 +1163,7 @@ void rai::rpc_handler::block_create ()
 				auto transaction (node.store.tx_begin_read ());
 				if (node.store.block_exists (transaction, previous) && node.store.block_balance (transaction, previous) != balance.number ())
 				{
-					ec = rai::error_rpc::block_create_balance_mismatch;
+					ec = nano::error_rpc::block_create_balance_mismatch;
 				}
 			}
 			// Check for incorrect account key
@@ -1171,7 +1171,7 @@ void rai::rpc_handler::block_create ()
 			{
 				if (account != pub)
 				{
-					ec = rai::error_rpc::block_create_public_key_mismatch;
+					ec = nano::error_rpc::block_create_public_key_mismatch;
 				}
 			}
 			if (type == "state")
@@ -1190,7 +1190,7 @@ void rai::rpc_handler::block_create ()
 				}
 				else
 				{
-					ec = rai::error_rpc::block_create_requirements_state;
+					ec = nano::error_rpc::block_create_requirements_state;
 				}
 			}
 			else if (type == "open")
@@ -1209,7 +1209,7 @@ void rai::rpc_handler::block_create ()
 				}
 				else
 				{
-					ec = rai::error_rpc::block_create_requirements_open;
+					ec = nano::error_rpc::block_create_requirements_open;
 				}
 			}
 			else if (type == "receive")
@@ -1228,7 +1228,7 @@ void rai::rpc_handler::block_create ()
 				}
 				else
 				{
-					ec = rai::error_rpc::block_create_requirements_receive;
+					ec = nano::error_rpc::block_create_requirements_receive;
 				}
 			}
 			else if (type == "change")
@@ -1247,7 +1247,7 @@ void rai::rpc_handler::block_create ()
 				}
 				else
 				{
-					ec = rai::error_rpc::block_create_requirements_change;
+					ec = nano::error_rpc::block_create_requirements_change;
 				}
 			}
 			else if (type == "send")
@@ -1268,22 +1268,22 @@ void rai::rpc_handler::block_create ()
 					}
 					else
 					{
-						ec = rai::error_common::insufficient_balance;
+						ec = nano::error_common::insufficient_balance;
 					}
 				}
 				else
 				{
-					ec = rai::error_rpc::block_create_requirements_send;
+					ec = nano::error_rpc::block_create_requirements_send;
 				}
 			}
 			else
 			{
-				ec = rai::error_blocks::invalid_type;
+				ec = nano::error_blocks::invalid_type;
 			}
 		}
 		else
 		{
-			ec = rai::error_rpc::block_create_key_required;
+			ec = nano::error_rpc::block_create_key_required;
 		}
 	}
 	response_errors ();
@@ -1304,7 +1304,7 @@ void rai::rpc_handler::block_hash ()
 	}
 	else
 	{
-		ec = rai::error_blocks::invalid_block;
+		ec = nano::error_blocks::invalid_block;
 	}
 	response_errors ();
 }
@@ -1325,12 +1325,12 @@ void rai::rpc_handler::bootstrap ()
 		}
 		else
 		{
-			ec = rai::error_common::invalid_port;
+			ec = nano::error_common::invalid_port;
 		}
 	}
 	else
 	{
-		ec = rai::error_common::invalid_ip_address;
+		ec = nano::error_common::invalid_ip_address;
 	}
 	response_errors ();
 }
@@ -1527,12 +1527,12 @@ void rai::rpc_handler::confirmation_info ()
 		}
 		else
 		{
-			ec = rai::error_rpc::confirmation_not_found;
+			ec = nano::error_rpc::confirmation_not_found;
 		}
 	}
 	else
 	{
-		ec = rai::error_rpc::invalid_root;
+		ec = nano::error_rpc::invalid_root;
 	}
 	response_errors ();
 }
@@ -1625,12 +1625,12 @@ void rai::rpc_handler::deterministic_key ()
 		}
 		catch (std::logic_error const &)
 		{
-			ec = rai::error_common::invalid_index;
+			ec = nano::error_common::invalid_index;
 		}
 	}
 	else
 	{
-		ec = rai::error_common::bad_seed;
+		ec = nano::error_common::bad_seed;
 	}
 	response_errors ();
 }
@@ -1815,7 +1815,7 @@ void rai::rpc_handler::account_history ()
 		}
 		else
 		{
-			ec = rai::error_blocks::bad_hash_number;
+			ec = nano::error_blocks::bad_hash_number;
 		}
 	}
 	else
@@ -1870,7 +1870,7 @@ void rai::rpc_handler::account_history ()
 		}
 		else
 		{
-			ec = rai::error_rpc::invalid_offset;
+			ec = nano::error_rpc::invalid_offset;
 		}
 	}
 	response_errors ();
@@ -1891,7 +1891,7 @@ void rai::rpc_handler::keepalive ()
 		}
 		else
 		{
-			ec = rai::error_common::invalid_port;
+			ec = nano::error_common::invalid_port;
 		}
 	}
 	response_errors ();
@@ -1919,7 +1919,7 @@ void rai::rpc_handler::key_expand ()
 	}
 	else
 	{
-		ec = rai::error_common::bad_private_key;
+		ec = nano::error_common::bad_private_key;
 	}
 	response_errors ();
 }
@@ -1936,7 +1936,7 @@ void rai::rpc_handler::ledger ()
 		{
 			if (start.decode_account (account_text.get ()))
 			{
-				ec = rai::error_common::bad_account_number;
+				ec = nano::error_common::bad_account_number;
 			}
 		}
 		uint64_t modified_since (0);
@@ -2063,7 +2063,7 @@ void rai::rpc_handler::mice_to_raw (rai::uint128_t ratio)
 		}
 		else
 		{
-			ec = rai::error_common::invalid_amount_big;
+			ec = nano::error_common::invalid_amount_big;
 		}
 	}
 	response_errors ();
@@ -2236,7 +2236,7 @@ void rai::rpc_handler::pending_exists ()
 		}
 		else
 		{
-			ec = rai::error_blocks::not_found;
+			ec = nano::error_blocks::not_found;
 		}
 	}
 	response_errors ();
@@ -2289,22 +2289,22 @@ void rai::rpc_handler::payment_begin ()
 				}
 				else
 				{
-					ec = rai::error_rpc::payment_unable_create_account;
+					ec = nano::error_rpc::payment_unable_create_account;
 				}
 			}
 			else
 			{
-				ec = rai::error_common::wallet_locked;
+				ec = nano::error_common::wallet_locked;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::wallet_not_found;
+			ec = nano::error_common::wallet_not_found;
 		}
 	}
 	else
 	{
-		ec = rai::error_common::bad_wallet_number;
+		ec = nano::error_common::bad_wallet_number;
 	}
 	response_errors ();
 }
@@ -2322,7 +2322,7 @@ void rai::rpc_handler::payment_init ()
 		}
 		else
 		{
-			ec = rai::error_common::wallet_locked;
+			ec = nano::error_common::wallet_locked;
 		}
 	}
 	response_errors ();
@@ -2345,12 +2345,12 @@ void rai::rpc_handler::payment_end ()
 			}
 			else
 			{
-				ec = rai::error_rpc::payment_account_balance;
+				ec = nano::error_rpc::payment_account_balance;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::account_not_found_wallet;
+			ec = nano::error_common::account_not_found_wallet;
 		}
 	}
 	response_errors ();
@@ -2377,7 +2377,7 @@ void rai::rpc_handler::payment_wait ()
 		}
 		else
 		{
-			ec = rai::error_rpc::bad_timeout;
+			ec = nano::error_rpc::bad_timeout;
 		}
 	}
 	if (ec)
@@ -2413,43 +2413,43 @@ void rai::rpc_handler::process ()
 				}
 				case rai::process_result::gap_previous:
 				{
-					ec = rai::error_process::gap_previous;
+					ec = nano::error_process::gap_previous;
 					break;
 				}
 				case rai::process_result::gap_source:
 				{
-					ec = rai::error_process::gap_source;
+					ec = nano::error_process::gap_source;
 					break;
 				}
 				case rai::process_result::old:
 				{
-					ec = rai::error_process::old;
+					ec = nano::error_process::old;
 					break;
 				}
 				case rai::process_result::bad_signature:
 				{
-					ec = rai::error_process::bad_signature;
+					ec = nano::error_process::bad_signature;
 					break;
 				}
 				case rai::process_result::negative_spend:
 				{
 					// TODO once we get RPC versioning, this should be changed to "negative spend"
-					ec = rai::error_process::negative_spend;
+					ec = nano::error_process::negative_spend;
 					break;
 				}
 				case rai::process_result::balance_mismatch:
 				{
-					ec = rai::error_process::balance_mismatch;
+					ec = nano::error_process::balance_mismatch;
 					break;
 				}
 				case rai::process_result::unreceivable:
 				{
-					ec = rai::error_process::unreceivable;
+					ec = nano::error_process::unreceivable;
 					break;
 				}
 				case rai::process_result::block_position:
 				{
-					ec = rai::error_process::block_position;
+					ec = nano::error_process::block_position;
 					break;
 				}
 				case rai::process_result::fork:
@@ -2463,25 +2463,25 @@ void rai::rpc_handler::process ()
 					}
 					else
 					{
-						ec = rai::error_process::fork;
+						ec = nano::error_process::fork;
 					}
 					break;
 				}
 				default:
 				{
-					ec = rai::error_process::other;
+					ec = nano::error_process::other;
 					break;
 				}
 			}
 		}
 		else
 		{
-			ec = rai::error_blocks::work_low;
+			ec = nano::error_blocks::work_low;
 		}
 	}
 	else
 	{
-		ec = rai::error_blocks::invalid_block;
+		ec = nano::error_blocks::invalid_block;
 	}
 	response_errors ();
 }
@@ -2524,7 +2524,7 @@ void rai::rpc_handler::receive ()
 							}
 							else
 							{
-								ec = rai::error_common::invalid_work;
+								ec = nano::error_common::invalid_work;
 							}
 						}
 						if (!ec)
@@ -2545,22 +2545,22 @@ void rai::rpc_handler::receive ()
 					}
 					else
 					{
-						ec = rai::error_process::unreceivable;
+						ec = nano::error_process::unreceivable;
 					}
 				}
 				else
 				{
-					ec = rai::error_blocks::not_found;
+					ec = nano::error_blocks::not_found;
 				}
 			}
 			else
 			{
-				ec = rai::error_common::account_not_found_wallet;
+				ec = nano::error_common::account_not_found_wallet;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::wallet_locked;
+			ec = nano::error_common::wallet_locked;
 		}
 	}
 	// Because of receive_async
@@ -2647,7 +2647,7 @@ void rai::rpc_handler::representatives_online ()
 			}
 			else
 			{
-				ec = rai::error_common::bad_account_number;
+				ec = nano::error_common::bad_account_number;
 				break;
 			}
 		}
@@ -2697,7 +2697,7 @@ void rai::rpc_handler::republish ()
 	{
 		if (decode_unsigned (sources_text.get (), sources))
 		{
-			ec = rai::error_rpc::invalid_sources;
+			ec = nano::error_rpc::invalid_sources;
 		}
 	}
 	boost::optional<std::string> destinations_text (request.get_optional<std::string> ("destinations"));
@@ -2705,7 +2705,7 @@ void rai::rpc_handler::republish ()
 	{
 		if (decode_unsigned (destinations_text.get (), destinations))
 		{
-			ec = rai::error_rpc::invalid_destinations;
+			ec = nano::error_rpc::invalid_destinations;
 		}
 	}
 	auto hash (hash_impl ());
@@ -2788,7 +2788,7 @@ void rai::rpc_handler::republish ()
 		}
 		else
 		{
-			ec = rai::error_blocks::not_found;
+			ec = nano::error_blocks::not_found;
 		}
 	}
 	response_errors ();
@@ -2825,7 +2825,7 @@ void rai::rpc_handler::send ()
 	// Sending 0 amount is invalid with state blocks
 	if (!ec && amount.is_zero ())
 	{
-		ec = rai::error_common::invalid_amount;
+		ec = nano::error_common::invalid_amount;
 	}
 	if (!ec)
 	{
@@ -2851,7 +2851,7 @@ void rai::rpc_handler::send ()
 						}
 						else
 						{
-							ec = rai::error_common::account_not_found;
+							ec = nano::error_common::account_not_found;
 						}
 						if (!ec && work)
 						{
@@ -2861,13 +2861,13 @@ void rai::rpc_handler::send ()
 							}
 							else
 							{
-								ec = rai::error_common::invalid_work;
+								ec = nano::error_common::invalid_work;
 							}
 						}
 					}
 					else
 					{
-						ec = rai::error_common::wallet_locked;
+						ec = nano::error_common::wallet_locked;
 					}
 				}
 				if (!ec)
@@ -2891,7 +2891,7 @@ void rai::rpc_handler::send ()
 							}
 							else
 							{
-								std::error_code ec (rai::error_common::insufficient_balance);
+								std::error_code ec (nano::error_common::insufficient_balance);
 								error_response (response_a, ec.message ());
 							}
 						}
@@ -2901,12 +2901,12 @@ void rai::rpc_handler::send ()
 			}
 			else
 			{
-				ec = rai::error_rpc::bad_destination;
+				ec = nano::error_rpc::bad_destination;
 			}
 		}
 		else
 		{
-			ec = rai::error_rpc::bad_source;
+			ec = nano::error_rpc::bad_source;
 		}
 	}
 	// Because of send_async
@@ -2930,7 +2930,7 @@ void rai::rpc_handler::stats ()
 	}
 	else
 	{
-		ec = rai::error_rpc::invalid_missing_type;
+		ec = nano::error_rpc::invalid_missing_type;
 	}
 	if (!ec)
 	{
@@ -3007,7 +3007,7 @@ void rai::rpc_handler::unchecked_get ()
 		}
 		if (response_l.empty ())
 		{
-			ec = rai::error_blocks::not_found;
+			ec = nano::error_blocks::not_found;
 		}
 	}
 	response_errors ();
@@ -3022,7 +3022,7 @@ void rai::rpc_handler::unchecked_keys ()
 	{
 		if (key.decode_hex (hash_text.get ()))
 		{
-			ec = rai::error_rpc::bad_key;
+			ec = nano::error_rpc::bad_key;
 		}
 	}
 	if (!ec)
@@ -3081,12 +3081,12 @@ void rai::rpc_handler::wallet_add ()
 			}
 			else
 			{
-				ec = rai::error_common::wallet_locked;
+				ec = nano::error_common::wallet_locked;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::bad_private_key;
+			ec = nano::error_common::bad_private_key;
 		}
 	}
 	response_errors ();
@@ -3113,7 +3113,7 @@ void rai::rpc_handler::wallet_add_watch ()
 		}
 		else
 		{
-			ec = rai::error_common::wallet_locked;
+			ec = nano::error_common::wallet_locked;
 		}
 	}
 	response_errors ();
@@ -3201,12 +3201,12 @@ void rai::rpc_handler::wallet_change_seed ()
 			}
 			else
 			{
-				ec = rai::error_common::wallet_locked;
+				ec = nano::error_common::wallet_locked;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::bad_seed;
+			ec = nano::error_common::bad_seed;
 		}
 	}
 	response_errors ();
@@ -3240,7 +3240,7 @@ void rai::rpc_handler::wallet_create ()
 		}
 		else
 		{
-			ec = rai::error_common::wallet_lmdb_max_dbs;
+			ec = nano::error_common::wallet_lmdb_max_dbs;
 		}
 	}
 	response_errors ();
@@ -3264,12 +3264,12 @@ void rai::rpc_handler::wallet_destroy ()
 			}
 			else
 			{
-				ec = rai::error_common::wallet_not_found;
+				ec = nano::error_common::wallet_not_found;
 			}
 		}
 		else
 		{
-			ec = rai::error_common::bad_wallet_number;
+			ec = nano::error_common::bad_wallet_number;
 		}
 	}
 	response_errors ();
@@ -3485,7 +3485,7 @@ void rai::rpc_handler::wallet_representative_set ()
 		}
 		else
 		{
-			ec = rai::error_rpc::bad_representative_number;
+			ec = nano::error_rpc::bad_representative_number;
 		}
 	}
 	response_errors ();
@@ -3614,7 +3614,7 @@ void rai::rpc_handler::work_get ()
 		}
 		else
 		{
-			ec = rai::error_common::account_not_found_wallet;
+			ec = nano::error_common::account_not_found_wallet;
 		}
 	}
 	response_errors ();
@@ -3636,7 +3636,7 @@ void rai::rpc_handler::work_set ()
 		}
 		else
 		{
-			ec = rai::error_common::account_not_found_wallet;
+			ec = nano::error_common::account_not_found_wallet;
 		}
 	}
 	response_errors ();
@@ -3669,7 +3669,7 @@ void rai::rpc_handler::work_peer_add ()
 		}
 		else
 		{
-			ec = rai::error_common::invalid_port;
+			ec = nano::error_common::invalid_port;
 		}
 	}
 	response_errors ();
