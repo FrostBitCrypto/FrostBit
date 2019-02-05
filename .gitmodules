@@ -11,7 +11,6 @@
 	path = lmdb
 	url = https://github.com/nanocurrency/lmdb.git
 	branch = lmdb_0_9_21
-	ignore = dirty
 [submodule "phc-winner-argon2"]
 	path = phc-winner-argon2
 	url = https://github.com/clemahieu/phc-winner-argon2.git
