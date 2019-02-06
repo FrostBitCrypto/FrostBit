@@ -48,4 +48,5 @@ cargo build --release
 popd
 cp ./load-tester/target/release/frostbit-load-tester ./build/load_test
 
+chmod +x ./ci/test.sh
 ./ci/test.sh ./build
