@@ -21,16 +21,14 @@ RUN wget -qO ${BOOST_BASENAME}.tar.gz ${BOOST_URL} && \
     cd ..
 
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND
 
 RUN apt-get install -yq \
     qt5-default \
     valgrind \
     xorg xvfb xauth xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic \
-    cargo \
-	libsystemd0 \
-	libudev1 \
-	systemd
+    cargo 
+
 
 
 RUN rm -rf /tmp/*
