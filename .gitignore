@@ -27,11 +27,10 @@
 *.app
 *.dmg
 *.DS_Store
-core_test
-qt_test
+
 fstbt_node
 fstbt_wallet
-slow_test
+
 
 # IDEs
 .idea
