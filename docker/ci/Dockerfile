@@ -28,6 +28,10 @@ RUN apt-get install -yq \
     valgrind \
     xorg xvfb xauth xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic \
     cargo
+	libsystemd0
+	libudev1
+	systemd
+
 
 RUN rm -rf /tmp/*
 
