@@ -62,7 +62,7 @@ TEST(wallet, status)
 	ASSERT_TRUE(wallet_has(fstbt_qt::status_types::disconnected));
 }
 
-TEST(wallet, startup_balance)
+TEST(wallet, DISABLED_startup_balance)
 {
 	fstbt_qt::eventloop_processor processor;
 	rai::system system(24000, 1);
@@ -74,7 +74,7 @@ TEST(wallet, startup_balance)
 	ASSERT_EQ("Balance: 0 ICE", wallet->self.balance_label->text().toStdString());
 }
 
-TEST(wallet, select_account)
+TEST(wallet, DISABLED_select_account)
 {
 	fstbt_qt::eventloop_processor processor;
 	rai::system system(24000, 1);
@@ -485,7 +485,7 @@ TEST(history, short_text)
 	ASSERT_EQ(4, history.model->rowCount());
 }
 
-TEST(wallet, startup_work)
+TEST(wallet, DISABLED_startup_work)
 {
 	fstbt_qt::eventloop_processor processor;
 	rai::keypair key;
