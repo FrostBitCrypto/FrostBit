@@ -21,7 +21,7 @@ RUN wget -qO ${BOOST_BASENAME}.tar.gz ${BOOST_URL} && \
     cd ..
 
 
-ENV DEBIAN_FRONTEND
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get install -yq \
     qt5-default \
