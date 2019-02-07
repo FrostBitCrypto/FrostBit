@@ -42,7 +42,7 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script: ci/deploy-docker.sh
+  script: sh ci/deploy-docker.sh
   on:
     all_branches: true
     condition: -n "$ONE_TIME_TESTS"
