@@ -26,7 +26,7 @@ for network in live beta; do
         network_tag_suffix="-${network}"
     fi
 
-    docker_image_name="frostbit/frostbit${network_tag_suffix}"
+    docker_image_name="frostbitdev/frostbit${network_tag_suffix}"
 
     "$scripts"/custom-timeout.sh 30 docker build --build-arg NETWORK="$network" -f docker/node/Dockerfile -t "$docker_image_name" .
     for tag in "${tags[@]}"; do
