@@ -43,9 +43,9 @@ block_processor_batch_max_time (std::chrono::milliseconds (5000))
 			break;
 		case rai::fstbt_networks::fstbt_live_network:
 			preconfigured_peers.push_back ("prod.frostbit.info");
-			preconfigured_representatives.push_back (rai::account ("FFDC5AFA0F336584A0E8C29678C1C06D8CC5346296F046B08F4700ACE37D62BF"));
-			preconfigured_representatives.push_back (rai::account ("6A09FABA9CF9A43C3F498F39ADEAEA9C2FC7B2F1FD7691A0D0952F8AFAE4A6C7"));
-			preconfigured_representatives.push_back (rai::account ("0EF0FB8C9ACCA4964C766F8EB9F88F94785396CD6B44521E25F2AD271B8F41B2"));
+			preconfigured_representatives.push_back (rai::account ("71FCED72FCA6668209AF8946ECD13BBB3B0ACDC40426FFFFCDAA3E995ECBB072"));
+			preconfigured_representatives.push_back (rai::account ("32D25E429F80CACF50B0513F3FE4341964473BACD4F7BB65F4F661D0BD31E545"));
+			preconfigured_representatives.push_back (rai::account ("9D64ECF12DD060C09B30831F23619833A442995458117B9815E524D7969D22FC"));
 
 			break;
 		default:
